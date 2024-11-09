@@ -2,6 +2,7 @@ from uagents import Agent, Bureau, Context, Model, Protocol
 from singer import generate_song
 from dotenv import load_dotenv
 import os
+import time
 
 load_dotenv()
 
@@ -9,6 +10,14 @@ lyricist_seed = os.getenv("FET_LYRICIST_SEED", "RhythmIQ Lyricist seed phrase")
 mailbox_key = os.getenv("FET_LYRICIST_MAILBOX", "RhythmIQ Lyricist mail")
 # Create a single agent - RhythmIQ Lyricist
 lyricist = Agent(name="RhythmIQ Lyricist", seed=lyricist_seed)#, mailbox=f"{mailbox_key}@https://agentverse.ai")
+
+class Request(Model):
+    text: str
+
+class Response(Model):
+    timestamp: int
+    text: str
+    agent_address: str
 
 # Define the models
 class BroadcastSongRequest(Model):
@@ -45,6 +54,16 @@ async def handle_song_request(ctx: Context, sender: str, msg: BroadcastSongReque
 
 # Include protocol in the lyricist agent
 lyricist.include(proto)
+
+
+@lyricist.on_rest_post("/rest/post", Request, Response)
+async def handle_post(ctx: Context, req: Request) -> Response:
+    ctx.logger.info("Received POST request")
+    return Response(
+        text=f"Received: {req.text}",
+        agent_address=ctx.agent.address,
+        timestamp=int(time.time()),
+    )
 
 # Initialize the bureau and add the lyricist agent
 bureau = Bureau(port=8000, endpoint="http://localhost:8000/submit")
