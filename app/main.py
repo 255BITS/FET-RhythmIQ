@@ -1,11 +1,12 @@
 from quart import Quart, render_template, jsonify, request
 from models import Song, init_db, get_db_pool
 import asyncio
+import os
 import json
 
 app = Quart(__name__)
 
-DATABASE_URL="postgresql://rhythmiq:rhythmiq@localhost:5432/rhythmiq"
+DATABASE_URL=os.getenv("DATABASE_URL", "postgresql://rhythmiq:rhythmiq@localhost:5432/rhythmiq")
 
 @app.before_serving
 async def setup():
@@ -55,4 +56,4 @@ async def skip_song():
     return jsonify({"status": "success"})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=8257)
