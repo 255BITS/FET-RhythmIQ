@@ -1,0 +1,38 @@
+name: RhythmIQ
+description: An automated AI music generator. Stream unlimited music. Turn on the song stream!
+
+pages:
+  - name: Home
+    path: /
+    components:
+      - type: Landing page
+
+  - name: Create Song
+    path: /queue
+    components:
+      - type: Panel
+        title: "Generation Queue"
+        components:
+          - type: Heading
+            text: "Active Agents:"
+          - type: List
+            items:
+              - "🎵 Lyric Agent: Working..."
+              - "🎹 Music Agent: Working..."
+          - type: Heading
+            text: "Recent Creations:"
+          - type: List
+            items:
+              - "\"Night Study #7\" (Complete)"
+              - "\"Chill Wave #4\" (Complete)"
+              - "\"Focus Beat #2\" (Complete)"
+
+models:
+  - name: Song
+    properties:
+      id: auto
+      name: string
+      details: json
+      tags: json
+      status: string
+      created_at: datetime
