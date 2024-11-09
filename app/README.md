@@ -62,3 +62,7 @@ To set up the project:
 4. Run the application: `python main.py`
 
 Make sure to have Python 3.7+ and PostgreSQL installed on your system before running the application.
+
+## Credits
+
+This project was created with [appcannon](https://github.com/255BITS/appcannon), a tool from 255labs.

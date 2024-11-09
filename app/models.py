@@ -2,6 +2,9 @@ import asyncpg
 from datetime import datetime
 import json
 
+# Define a global pool variable
+pool = None
+
 class Song:
     def __init__(self, id, name, created_at, status, details, tags):
         self.id = id
@@ -12,7 +15,13 @@ class Song:
         self.tags = tags
 
     @classmethod
-    async def create(cls, pool, name, status, details, tags):
+    async def create(cls, **kwargs):
+        # Set default values for optional fields
+        name = kwargs.get("name", "Unknown Title")
+        status = kwargs.get("status", "new")
+        details = kwargs.get("details", {})
+        tags = kwargs.get("tags", [])
+
         async with pool.acquire() as conn:
             row = await conn.fetchrow(
                 """
@@ -25,7 +34,7 @@ class Song:
         return cls(*row)
 
     @classmethod
-    async def get(cls, pool, song_id):
+    async def get(cls, song_id):
         async with pool.acquire() as conn:
             row = await conn.fetchrow(
                 "SELECT * FROM songs WHERE id = $1",
@@ -36,12 +45,12 @@ class Song:
         return None
 
     @classmethod
-    async def get_all(cls, pool):
+    async def get_all(cls):
         async with pool.acquire() as conn:
             rows = await conn.fetch("SELECT * FROM songs ORDER BY created_at DESC")
         return [cls(*row) for row in rows]
 
-    async def update_status(self, pool, new_status):
+    async def update_status(self, new_status):
         async with pool.acquire() as conn:
             await conn.execute(
                 "UPDATE songs SET status = $1 WHERE id = $2",
@@ -49,7 +58,7 @@ class Song:
             )
         self.status = new_status
 
-    async def update_details(self, pool, new_details):
+    async def update_details(self, new_details):
         async with pool.acquire() as conn:
             await conn.execute(
                 "UPDATE songs SET details = $1 WHERE id = $2",
@@ -57,7 +66,7 @@ class Song:
             )
         self.details = new_details
 
-    async def update_tags(self, pool, new_tags):
+    async def update_tags(self, new_tags):
         async with pool.acquire() as conn:
             await conn.execute(
                 "UPDATE songs SET tags = $1 WHERE id = $2",
@@ -65,7 +74,9 @@ class Song:
             )
         self.tags = new_tags
 
-async def init_db(pool):
+async def init_db(pool_instance):
+    global pool
+    pool = pool_instance
     async with pool.acquire() as conn:
         await conn.execute("""
             CREATE TABLE IF NOT EXISTS songs (
@@ -79,4 +90,7 @@ async def init_db(pool):
         """)
 
 async def get_db_pool(db_url):
-    return await asyncpg.create_pool(db_url)
+    global pool
+    if pool is None:
+        pool = await asyncpg.create_pool(db_url)
+    return pool
