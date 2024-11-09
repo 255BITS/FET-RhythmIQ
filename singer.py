@@ -24,6 +24,27 @@ LOCAL_SERVER_PORT = os.getenv("LOCAL_SERVER_PORT", "5000")  # Ensure it's a stri
 
 print(f"Using GPT Provider: {GPT_PROVIDER.capitalize()}")
 
+def load_random_instruction():
+    """
+    Loads a random instruction from the instructions directory.
+
+    Returns:
+        str: The content of a randomly selected instruction file.
+    """
+    instructions_dir = "instructions"
+    try:
+        instruction_files = [f for f in os.listdir(instructions_dir) if f.endswith('.txt')]
+        if not instruction_files:
+            raise FileNotFoundError("No instruction files found in the instructions directory.")
+        selected_file = random.choice(instruction_files)
+        with open(os.path.join(instructions_dir, selected_file), "r") as file:
+            instruction_content = file.read().strip()
+        return instruction_content
+    except Exception as e:
+        print(f"Error loading random instruction: {e}")
+        return None
+
+
 def validate_environment():
     """
     Validates that necessary environment variables are set based on the selected GPT provider.
@@ -128,7 +149,7 @@ def send_payload(prompt, server=LOCAL_SERVER_ADDRESS, port=LOCAL_SERVER_PORT):
 
     return response.json()["choices"][0]["message"]["content"]
 
-def generate_song(instruction):
+def generate_song(instruction=None):
     """
     Generates a song based on the provided instruction.
 
@@ -144,6 +165,11 @@ def generate_song(instruction):
     except ValueError as e:
         print(f"Configuration Error: {e}")
         return None
+    if instruction is None:
+        instruction = load_random_instruction()
+        if not instruction:
+            print("Failed to load a random instruction.")
+            return None
 
     # Get random song files for examples
     try:
@@ -215,15 +241,25 @@ def parse_song_response(response_text):
     """
     song_data = {}
     try:
-        title_match = re.search(r'Title:\s*(.*?)\n', response_text)
-        lyrics_match = re.search(r'Lyrics:\s*(.*?)\n\n', response_text, re.DOTALL)
+        # Use regex to extract different parts of the song.txt content
+        title_match = re.search(r'Title:\s*(.*)', response_text, re.DOTALL)
+        lyrics_match = re.search(r'Lyrics:\s*(.*?)Style', response_text, re.DOTALL)
         style_match = re.search(r'Style:\s*(.*?)\n\n', response_text, re.DOTALL)
         negative_style_match = re.search(r'Negative Style:\s*(.*?)\n\n', response_text, re.DOTALL)
 
-        song_data['title'] = title_match.group(1).strip() if title_match else ""
-        song_data['lyrics'] = lyrics_match.group(1).strip() if lyrics_match else ""
-        song_data['style'] = style_match.group(1).strip() if style_match else ""
-        song_data['negative_style'] = negative_style_match.group(1).strip() if negative_style_match else ""
+        # Extracted data
+        title = title_match.group(1).strip()[:80] if title_match else "No title found"
+        if not lyrics_match:
+            assert False, "No lyrics found"
+        lyrics = lyrics_match.group(1).strip()[:3000]
+        style = style_match.group(1).strip()[:120] if style_match else "No style found"
+        negative_style = negative_style_match.group(1).strip()[:120] if negative_style_match else ""
+
+
+        song_data['title'] = title
+        song_data['lyrics'] = lyrics
+        song_data['style'] = style
+        song_data['negative_style'] = negative_style
 
     except Exception as e:
         print(f"Error parsing song response: {e}")

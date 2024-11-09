@@ -17,6 +17,8 @@ fox_api_key = os.getenv("FOX_API_KEY")
 singer_seed = os.getenv("FET_SINGER_SEED", "RhythmIQ Singer seed phrase")
 singer = Agent(name="RhythmIQ Singer", seed=singer_seed)
 
+class EmptyRequest(Model):
+    pass
 
 class Request(Model):
     text: str
@@ -63,30 +65,6 @@ async def handle_song_request(ctx: Context, sender: str, msg: BroadcastSongReque
         ctx.logger.error("Failed to generate song.")
 
 
-@singer.on_rest_post("/sing", GenerateAudioRequest, Response)
-async def handle_sing_post(ctx: Context, req: GenerateAudioRequest) -> Response:
-    ctx.logger.info(f"Received /sing POST request with data: {req}")
-
-    song_ids = generate_audio(
-        title=req.title,  # Title can be empty or extracted from 'req' if available
-        lyrics=req.lyrics,  # Lyrics can be empty or extracted from 'req' if available
-        style=req.style,  # Style can be empty or extracted from 'req' if available
-        negative_style=req.negative_style  # Negative style can be empty or extracted from 'req' if available
-    )
-    if song_ids:
-        ctx.logger.info(f"Song IDs received: {song_ids}")
-        try:
-            audio_url, image_url = poll_for_audio(song_ids)
-            return Response(
-                text=f"audio_url: {audio_url} image url: {image_url}",
-                agent_address=ctx.agent.address,
-                timestamp=int(time.time()),
-            )
-        except Exception as e:
-            ctx.logger.error(f"Error during polling: {e}")
-    else:
-        ctx.logger.error("Failed to initiate audio generation.")
-
 # Include protocol in the lyricist agent
 lyricist.include(proto)
 
@@ -127,7 +105,6 @@ def generate_audio(title, lyrics, style, negative_style):
             return song_ids
     return None
 
-# Function to poll for the generated audio
 def poll_for_audio(song_ids):
     headers = {
         'Content-Type': 'application/json',
@@ -136,22 +113,83 @@ def poll_for_audio(song_ids):
     params = {
         'ids': ','.join(song_ids)
     }
+    response = requests.get('https://api.sunoaiapi.com/api/v1/gateway/query', params=params, headers=headers)
+    print("Polling response:", response.status_code)
+    print(json.dumps(response.json(), indent=2))
+    if response.status_code == 200:
+        resp_data = response.json()
+        return resp_data
+    else:
+        return None
+
+# Function to wait until all songs are complete
+def poll_until_complete(song_ids):
     while True:
-        print("polling")
+        print("Polling for song status...")
         time.sleep(5)  # Wait before polling again
-        response = requests.get('https://api.sunoaiapi.com/api/v1/gateway/query', params=params, headers=headers)
-        print("---",response.status_code)
-        print(json.dumps(response.json(), indent=2))
-        if response.status_code == 200:
-            resp_data = response.json()
-            if isinstance(resp_data, list):
-                for item in resp_data:
-                    if item['status'] == 'complete':
-                        audio_url = item.get('audio_url')
-                        image_url = item.get('image_url')
-                        return audio_url, image_url
-                    elif item['status'] == 'error':
-                        raise Exception(f"Generation error: {item['meta_data'].get('error_message')}")
+        resp_data = poll_for_audio(song_ids)
+        if resp_data:
+            statuses = [item['status'] for item in resp_data]
+            print(f"Current statuses: {statuses}")
+            if all(status == 'complete' for status in statuses):
+                print("All songs completed.")
+                return resp_data
+            elif any(status == 'error' for status in statuses):
+                errors = [item for item in resp_data if item['status'] == 'error']
+                error_messages = [item['meta_data'].get('error_message', 'Unknown error') for item in errors]
+                raise Exception(f"Generation error(s): {error_messages}")
+            else:
+                continue
+        else:
+            raise Exception("Failed to poll for audio.")
+
+@singer.on_rest_post("/sing", GenerateAudioRequest, Response)
+async def handle_sing_post(ctx: Context, req: GenerateAudioRequest) -> Response:
+    ctx.logger.info(f"Received /sing POST request with data: {req}")
+
+    song_ids = generate_audio(
+        title=req.title,
+        lyrics=req.lyrics,
+        style=req.style,
+        negative_style=req.negative_style
+    )
+    if song_ids:
+        ctx.logger.info(f"Song IDs received: {song_ids}")
+        try:
+            song_data = poll_until_complete(song_ids)
+            # Extract required information
+            statuses = [item['status'] for item in song_data]
+            audio_urls = [item.get('audio_url') for item in song_data]
+            image_urls = [item.get('image_url') for item in song_data]
+            video_urls = [item.get('video_url') for item in song_data]
+            image_large_urls = [item.get('image_large_url') for item in song_data]
+
+            response_text = (
+                f"statuses: {statuses}, "
+                f"audio_urls: {audio_urls}, "
+                f"image_urls: {image_urls}, "
+                f"video_urls: {video_urls}, "
+                f"image_large_urls: {image_large_urls}"
+            )
+            return Response(
+                text=response_text,
+                agent_address=ctx.agent.address,
+                timestamp=int(time.time()),
+            )
+        except Exception as e:
+            ctx.logger.error(f"Error during polling: {e}")
+            return Response(
+                text=f"Error during polling: {e}",
+                agent_address=ctx.agent.address,
+                timestamp=int(time.time()),
+            )
+    else:
+        ctx.logger.error("Failed to initiate audio generation.")
+        return Response(
+            text="Failed to initiate audio generation.",
+            agent_address=ctx.agent.address,
+            timestamp=int(time.time()),
+        )
 
 @audio_proto.on_message(model=GenerateAudioRequest, replies=GenerateAudioResponse)
 async def handle_generate_audio(ctx: Context, sender: str, msg: GenerateAudioRequest):
@@ -175,6 +213,55 @@ async def handle_generate_audio(ctx: Context, sender: str, msg: GenerateAudioReq
             ctx.logger.error(f"Error during polling: {e}")
     else:
         ctx.logger.error("Failed to initiate audio generation.")
+
+# Combined endpoint that takes no arguments, runs lyricist and singer in sequence
+@singer.on_rest_post("/orchestrate", EmptyRequest, Response)
+async def handle_orchestrate_post(ctx: Context, req: EmptyRequest) -> Response:
+    ctx.logger.info("Received orchestrate request")
+
+    # Step 1: Generate lyrics using the lyricist
+    # We'll call generate_song without any arguments
+    song_data = generate_song()
+
+    if not song_data:
+        ctx.logger.error("Failed to generate song data in lyricist.")
+        return Response(
+            text="Failed to generate song lyrics.",
+            agent_address=ctx.agent.address,
+            timestamp=int(time.time()),
+        )
+
+    # Step 2: Generate audio using the singer
+    song_ids = generate_audio(
+        title=song_data.get('title', ''),
+        lyrics=song_data.get('lyrics', ''),
+        style=song_data.get('style', ''),
+        negative_style=song_data.get('negative_style', '')
+    )
+    if song_ids:
+        try:
+            song_data_list = poll_until_complete(song_ids)
+            audio_url = song_data_list[0].get('audio_url')
+            image_url = song_data_list[0].get('image_url')
+            return Response(
+                text=f"Orchestrate completed. Audio URL: {audio_url}, Image URL: {image_url}",
+                agent_address=ctx.agent.address,
+                timestamp=int(time.time()),
+            )
+        except Exception as e:
+            ctx.logger.error(f"Error during orchestrate polling: {e}")
+            return Response(
+                text=f"Error during orchestrate polling: {e}",
+                agent_address=ctx.agent.address,
+                timestamp=int(time.time()),
+            )
+    else:
+        ctx.logger.error("Failed to initiate audio generation in orchestrate.")
+        return Response(
+            text="Failed to initiate audio generation in orchestrate.",
+            agent_address=ctx.agent.address,
+            timestamp=int(time.time()),
+        )
 
 # Include protocol in the singer agent
 singer.include(audio_proto)
