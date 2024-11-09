@@ -215,13 +215,11 @@ def parse_song_response(response_text):
     """
     song_data = {}
     try:
-        description_match = re.search(r'Description:\s*(.*?)\n\n', response_text, re.DOTALL)
         title_match = re.search(r'Title:\s*(.*?)\n', response_text)
         lyrics_match = re.search(r'Lyrics:\s*(.*?)\n\n', response_text, re.DOTALL)
         style_match = re.search(r'Style:\s*(.*?)\n\n', response_text, re.DOTALL)
         negative_style_match = re.search(r'Negative Style:\s*(.*?)\n\n', response_text, re.DOTALL)
 
-        song_data['description'] = description_match.group(1).strip() if description_match else ""
         song_data['title'] = title_match.group(1).strip() if title_match else ""
         song_data['lyrics'] = lyrics_match.group(1).strip() if lyrics_match else ""
         song_data['style'] = style_match.group(1).strip() if style_match else ""
@@ -241,7 +239,6 @@ def main():
 
     if song_data:
         print("\nGenerated Song Data:")
-        print(f"Description: {song_data['description']}")
         print(f"Title: {song_data['title']}")
         print(f"Lyrics:\n{song_data['lyrics']}")
         print(f"Style: {song_data['style']}")
