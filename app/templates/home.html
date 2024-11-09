@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-4xl font-bold mb-8">Welcome to RhythmIQ</h1>
+    
+    <div class="bg-white shadow-md rounded-lg p-6 mb-8">
+        <h2 class="text-2xl font-semibold mb-4">Music Stream</h2>
+        <div class="flex space-x-4 mb-4">
+            <button 
+                class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+                x-on:click="startMusicStream()"
+            >
+                Start Stream
+            </button>
+            <button 
+                class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded"
+                x-on:click="pauseMusicStream()"
+            >
+                Pause Stream
+            </button>
+            <button 
+                class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
+                x-on:click="skipSong()"
+            >
+                Skip Song
+            </button>
+        </div>
+        <div id="now-playing" class="text-lg">
+            Now Playing: <span id="current-song">No song playing</span>
+        </div>
+    </div>
+
+    <div class="bg-white shadow-md rounded-lg p-6">
+        <h2 class="text-2xl font-semibold mb-4">Create Song Queue</h2>
+        <div 
+            id="song-queue"
+            hx-get="/queue"
+            hx-trigger="load, every 5s"
+            hx-swap="innerHTML"
+        >
+            Loading queue...
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function startMusicStream() {
+        // Implementation for starting the music stream
+        console.log("Starting music stream");
+        // You would typically make an API call here to start the stream
+    }
+
+    function pauseMusicStream() {
+        // Implementation for pausing the music stream
+        console.log("Pausing music stream");
+        // You would typically make an API call here to pause the stream
+    }
+
+    function skipSong() {
+        // Implementation for skipping to the next song
+        console.log("Skipping to next song");
+        // You would typically make an API call here to skip the current song
+    }
+</script>
+{% endblock %}

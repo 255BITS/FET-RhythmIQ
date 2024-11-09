@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6">Create Song</h1>
+
+    <div x-data="{ queue: [] }" x-init="setInterval(() => { htmx.ajax('GET', '/queue', { target: '#queue-container', swap: 'innerHTML' }); }, 5000)">
+        <h2 class="text-2xl font-semibold mb-4">Generation Queue</h2>
+        <div id="queue-container" class="bg-white shadow-md rounded-lg p-4">
+            <template x-if="queue.length === 0">
+                <p>No songs in the queue.</p>
+            </template>
+            <template x-for="song in queue" :key="song.id">
+                <div class="mb-4 p-4 border rounded-lg">
+                    <h3 x-text="song.name" class="text-xl font-semibold"></h3>
+                    <p>Status: <span x-text="song.status" class="font-medium"></span></p>
+                    <div x-show="song.status === 'generating'" class="mt-2">
+                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                            <div class="bg-blue-600 h-2.5 rounded-full" x-bind:style="'width: ' + song.progress + '%'"></div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+
+    <div class="mt-8">
+        <h2 class="text-2xl font-semibold mb-4">Generate New Song</h2>
+        <form hx-post="/create_song" hx-target="#queue-container" hx-swap="beforeend" class="space-y-4">
+            <div>
+                <label for="song_name" class="block text-sm font-medium text-gray-700">Song Name</label>
+                <input type="text" id="song_name" name="song_name" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+            </div>
+            <div>
+                <label for="genre" class="block text-sm font-medium text-gray-700">Genre</label>
+                <select id="genre" name="genre" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                    <option value="pop">Pop</option>
+                    <option value="rock">Rock</option>
+                    <option value="jazz">Jazz</option>
+                    <option value="classical">Classical</option>
+                    <option value="electronic">Electronic</option>
+                </select>
+            </div>
+            <div>
+                <label for="mood" class="block text-sm font-medium text-gray-700">Mood</label>
+                <select id="mood" name="mood" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                    <option value="happy">Happy</option>
+                    <option value="sad">Sad</option>
+                    <option value="energetic">Energetic</option>
+                    <option value="relaxed">Relaxed</option>
+                    <option value="mysterious">Mysterious</option>
+                </select>
+            </div>
+            <div>
+                <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Generate Song
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
