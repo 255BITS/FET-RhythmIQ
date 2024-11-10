@@ -1,0 +1,26 @@
+version: '3.3'
+services:
+  rhythmiq:
+    ports:
+      - 8257:8257
+    environment:
+      - ENV=production
+      - DATABASE_URL=$DATABASE_URL
+
+    image: '532091552808.dkr.ecr.us-west-2.amazonaws.com/rhythmiq:1.0'
+    deploy:
+      restart_policy:
+        delay: 5s
+      replicas: 1
+      placement:
+       constraints: 
+         - node.role == worker
+         - node.labels.worker==true
+    dns:
+      - 8.8.8.8
+    networks:
+      - rhythmiq_network
+
+networks:
+  rhythmiq_network:
+    driver: overlay
