@@ -33,7 +33,6 @@ To use RhythmIQ, simply navigate to the home page and start the song stream. The
 - `created_at`: DateTime, when the song was created
 - `status`: String, the current status of the song (e.g., "generating", "complete")
 - `details`: JSON, additional details about the song
-- `tags`: JSON, tags associated with the song
 
 ## Available CSS styles
 
