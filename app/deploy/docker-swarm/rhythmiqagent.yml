@@ -1,0 +1,25 @@
+version: '3.3'
+services:
+  rhythmiqagent:
+    ports:
+      - 8258:8258
+    environment:
+      - ENV=production
+
+    image: '532091552808.dkr.ecr.us-west-2.amazonaws.com/rhythmiqagent:1.0'
+    deploy:
+      restart_policy:
+        delay: 5s
+      replicas: 1
+      placement:
+       constraints: 
+         - node.role == worker
+         - node.labels.worker==true
+    dns:
+      - 8.8.8.8
+    networks:
+      - rhythmiqagent_network
+
+networks:
+  rhythmiqagent_network:
+    driver: overlay
