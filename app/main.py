@@ -101,11 +101,6 @@ async def generate_song_with_agent(songs):
                 sing_results = response_sing.json()
                 print(sing_results)
                 # Expecting sing_results to be a list of two dictionaries
-                if not isinstance(sing_results, list) or len(sing_results) != 2:
-                    error_msg = f"Invalid response format from /sing. Expected a list of two song media data. got {sing_results}"
-                    logging.error(error_msg)
-                    return jsonify({"error": error_msg}), 500
-
                 logging.info("Media URLs received from /sing endpoint.")
             else:
                 for song in songs:
@@ -114,19 +109,6 @@ async def generate_song_with_agent(songs):
                 logging.error(error_msg)
                 return jsonify({"error": error_msg}), response_sing.status_code
 
-            # Step 3: Create two Song instances with the same lyrics but different media URLs
-            songs_created = []
-            for song, sing_result in zip(songs, sing_results):
-                await song.update_media_urls(
-                    image_url=sing_result.get('image_url'),
-                    image_large_url=sing_result.get('image_large_url'),
-                    video_url=sing_result.get('video_url'),
-                    audio_url=sing_result.get('audio_url')
-                )
-                # Final update status
-                await song.update_status("complete")
-                logging.info(f"Created Song ID: {song.id} with media URLs from /sing.")
-            # Parsing sing_results as a single dictionary with multiple URLs
             if not isinstance(sing_results, dict):
                 error_msg = f"Invalid response format from /sing. Expected a dictionary with media URLs. got {sing_results}"
                 logging.error(error_msg)
