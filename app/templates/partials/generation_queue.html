@@ -1,0 +1,15 @@
+<div class="generation-items">
+    {% for item in queue %}
+    <div class="generation-item">
+        <div class="item-header">
+            <span class="item-name">{{ item.name }}</span>
+            <span class="status-tag">{{ item.status }}</span>
+        </div>
+        {% if item.status == 'generating' %}
+        <div class="progress-container">
+            <div class="progress-bar" style="width: {{ item.progress }}%"></div>
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>

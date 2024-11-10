@@ -3,37 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RhythmIQ - AI Music Generator</title>
+    <title>RhythmIQ - Infinite AI Radio</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <script src="https://unpkg.com/htmx.org@1.9.2"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600&display=swap" rel="stylesheet">
 </head>
-<body class="bg-gray-100 font-sans">
-    <header class="bg-blue-600 text-white p-4">
-        <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-bold">RhythmIQ</h1>
-            <nav>
-                <ul class="flex space-x-4">
-                    <li><a href="{{ url_for('home') }}" class="hover:text-blue-200">Home</a></li>
-                    <li><a href="{{ url_for('create_song') }}" class="hover:text-blue-200">Create Song</a></li>
-                </ul>
+<body class="bg-[#1a1b26] text-gray-100 font-sans">
+    <div class="max-w-4xl mx-auto p-6">
+        <div class="retro-player-container">
+            <div class="player-header">
+                <div class="logo-container">
+                    <span class="wave-icon">(((•)))</span>
+                    <h1 class="retro-title">RhythmIQ</h1>
+                </div>
+                <div class="volume-control">
+                    <span class="volume-icon">🔊</span>
+                    <div class="volume-slider"></div>
+                </div>
+            </div>
+            <nav class="player-nav">
+                <a href="{{ url_for('home') }}" class="nav-link">Stream</a>
+                <a href="{{ url_for('create_song') }}" class="nav-link">Create</a>
             </nav>
+
+            {% block content %}{% endblock %}
         </div>
-    </header>
-
-    <main class="container mx-auto mt-8 p-4">
-        {% block content %}{% endblock %}
-    </main>
-
-    <footer class="bg-gray-200 text-center p-4 mt-8">
-        <p>&copy; 2023 RhythmIQ. All rights reserved.</p>
-    </footer>
+    </div>
 
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
-    <script>
-        document.body.addEventListener('htmx:configRequest', (event) => {
-        });
-    </script>
 </body>
 </html>

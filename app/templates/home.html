@@ -1,47 +1,50 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8">
-    <h1 class="text-4xl font-bold mb-8">Welcome to RhythmIQ</h1>
-    
-    <div class="bg-white shadow-md rounded-lg p-6 mb-8">
-        <h2 class="text-2xl font-semibold mb-4">Music Stream</h2>
-        <div class="flex space-x-4 mb-4">
-            <button 
-                class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
-                x-on:click="startMusicStream()"
-            >
-                Start Stream
-            </button>
-            <button 
-                class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded"
-                x-on:click="pauseMusicStream()"
-            >
-                Pause Stream
-            </button>
-            <button 
-                class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
-                x-on:click="skipSong()"
-            >
-                Skip Song
-            </button>
-        </div>
-        <div id="now-playing" class="text-lg">
-            Now Playing: <span id="current-song">No song playing</span>
+<div class="player-content" x-data="{ isPlaying: false }">
+    <div class="visualizer-container">
+        <div class="visualizer" id="audio-visualizer">
+            <!-- Bars will be generated via JS -->
+            {% for i in range(32) %}
+            <div class="visualizer-bar"></div>
+            {% endfor %}
         </div>
     </div>
-
-    <div class="bg-white shadow-md rounded-lg p-6">
-        <h2 class="text-2xl font-semibold mb-4">Create Song Queue</h2>
-        <div 
-            id="song-queue"
-            hx-get="/queue"
-            hx-trigger="load, every 5s"
-            hx-swap="innerHTML"
-        >
-            Loading queue...
+    
+    <div class="now-playing">
+        <span class="label">Now Playing:</span>
+        <span class="song-title" id="current-song" 
+              hx-get="/current-song"
+              hx-trigger="load, every 5s">
+            AI Generated Synthwave
+        </span>
+    </div>
+    
+    <div class="progress-bar" id="song-progress"></div>
+    
+    <div class="controls">
+        <button class="control-btn play-btn" 
+                x-on:click="isPlaying = !isPlaying"
+                x-bind:class="{ 'active': isPlaying }"
+                hx-post="/toggle-play"
+                hx-swap="none">
+            <span class="play-icon" x-text="isPlaying ? '⏸' : '▶'"></span>
+        </button>
+        <button class="control-btn skip-btn" 
+                hx-post="/skip-song"
+                hx-swap="none">
+            <span class="skip-icon">⏭</span>
+        </button>
+    </div>
+    
+    <div class="queue-section">
+        <h2 class="queue-title">Queue</h2>
+        <div class="queue-list"
+             id="queue-container"
+             hx-get="/queue"
+             hx-trigger="load, every 5s"
+             hx-swap="innerHTML">
         </div>
     </div>
 </div>
 {% endblock %}
-

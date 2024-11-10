@@ -1,20 +1,11 @@
-<div class="queue">
-    {% if songs %}
-    <ul class="space-y-4">
-        {% for song in songs %}
-        <li class="bg-white shadow-md rounded-lg p-4 flex items-center">
-            {% if song.image_url %}
-            <img src="{{ song.image_url }}" alt="{{ song.name }}" class="w-16 h-16 rounded mr-4">
-            {% endif %}
-            <div class="flex-1">
-                <h3 class="text-xl font-semibold">{{ song.name }}</h3>
-                <p class="text-gray-600">Status: {{ song.status }}</p>
-            </div>
-            <button class="ml-4 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">Skip</button>
-        </li>
-        {% endfor %}
-    </ul>
-    {% else %}
-    <p class="text-gray-700">No songs in the queue.</p>
-    {% endif %}
+<div class="queue-items">
+    {% for song in songs %}
+    <div class="queue-item">
+        <span class="song-name">{{ song.name }}</span>
+        <div class="song-info">
+            <span class="genre-tag">{{ song.genre }}</span>
+            <span class="ai-tag">AI Generated</span>
+        </div>
+    </div>
+    {% endfor %}
 </div>
