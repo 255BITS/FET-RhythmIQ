@@ -10,7 +10,12 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600&display=swap" rel="stylesheet">
 </head>
-<body class="bg-[#1a1b26] text-gray-100 font-sans">
+<body class="bg-[#1a1b26] text-gray-100 font-sans" x-data="{
+    isMuted: false,
+    toggleMute() {
+        this.isMuted = !this.isMuted; const audioPlayer = document.getElementById('audio-player'); if (audioPlayer) { audioPlayer.muted = this.isMuted; }
+    }
+}">
     <div class="max-w-4xl mx-auto p-6">
         <div class="retro-player-container">
             <div class="player-header">
@@ -19,7 +24,7 @@
                     <h1 class="retro-title">RhythmIQ</h1>
                 </div>
                 <div class="volume-control">
-                    <span class="volume-icon">🔊</span>
+                    <button x-on:click="toggleMute()" x-text="isMuted ? '🔇' : '🔊'" class="volume-icon"></button>
                     <div class="volume-slider"></div>
                 </div>
             </div>
