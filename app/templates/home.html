@@ -1,19 +1,29 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="player-content" x-data="{ isPlaying: false }">
+<div class="player-content" x-data="{
+    isPlaying: false,
+    currentTime: 0,
+    duration: 0,
+    progress: 0,
+    updateProgress() {
+        this.currentTime = this.$refs.audioPlayer.currentTime;
+        this.duration = this.$refs.audioPlayer.duration || 0;
+        this.progress = (this.currentTime / this.duration) * 100;
+    }
+}">
     <div class="now-playing">
         <div class="current-track-container">
             <img src="{{ current_song.image_large_url|default('/static/images/placeholder.jpg') }}"
                  alt="Album Cover" 
                  class="cover-image">
             <div class="track-info">
-                <audio id="audio-player" x-ref="audioPlayer" src="{{ current_song.audio_url }}"></audio>
+                <audio id="audio-player" x-ref="audioPlayer" src="{{ current_song.audio_url }}" x-on:timeupdate="updateProgress()"></audio>
 
                 <span class="label">Now Playing:</span>
                 <span class="song-title" id="current-song" 
                       hx-get="/current-song"
-                      hx-trigger="load, every 5s">
+                      hx-trigger="load">
                     {{ current_song.name|default('No track playing') }}
                 </span>
                 <span class="status-tag">{{ current_song.status }}</span>
@@ -29,7 +39,9 @@
         </div>
     </div>
     
-    <div class="progress-bar" id="song-progress"></div>
+    <div class="progress-bar" id="song-progress">
+        <div class="progress-fill" x-bind:style="{ width: progress + '%' }"></div>
+    </div>
     
     <div class="controls">
         <button class="control-btn play-btn" 
