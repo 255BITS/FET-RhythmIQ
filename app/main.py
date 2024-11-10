@@ -61,7 +61,6 @@ async def skip_song():
     return jsonify({"status": "success"})
 
 # New route to generate song using the agent
-@app.route('/generate_song_with_agent', methods=['POST'])
 async def generate_song_with_agent(songs):
     """
     Endpoint to generate songs by interacting with the /write_song and /sing endpoints.
