@@ -27,7 +27,7 @@
        </div>
     </div>
     
-    <div class="progress-bar" id="song-progress">
+    <div class="progress-bar" id="song-progress" x-on:click="seekSong($event)">
         <div class="progress-fill" x-bind:style="{ width: progress + '%' }"></div>
     </div>
     

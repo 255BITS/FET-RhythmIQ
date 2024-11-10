@@ -23,6 +23,15 @@
         this.currentTime = this.$refs.audioPlayer.currentTime;
         this.duration = this.$refs.audioPlayer.duration || 0;
         this.progress = (this.currentTime / this.duration) * 100;
+    },
+    seekSong(event) {
+        const progressBar = event.currentTarget;
+        const clickPosition = event.offsetX;
+        const barWidth = progressBar.offsetWidth;
+        const clickRatio = clickPosition / barWidth;
+        const newTime = clickRatio * this.duration;
+        this.$refs.audioPlayer.currentTime = newTime;
+        this.updateProgress();
     }
 }"
 }">
