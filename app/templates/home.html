@@ -4,26 +4,14 @@
 <div class="player-content">
     <div class="now-playing">
         <div class="current-track-container">
-            <img src="{{ current_song.image_large_url|default('/static/images/placeholder.jpg', true) }}"
+            <img :src="currentSongImage"
                  alt="Album Cover" 
                  class="cover-image">
             <div class="track-info">
                 <span class="label">Now Playing:</span>
-                <span class="song-title" id="current-song" 
-                      hx-get="/current-song"
-                      hx-trigger="load">
-                    {{ current_song.name|default('No track playing') }}
-                </span>
-               <span class="style-tag-full" id="current-song" data-song-id="{{ current_song.id }}">{{ current_song.details.style }}</span>
+                <span class="song-title" x-text="currentSongName"></span>
+                <span class="style-tag-full" x-text="currentSongStyle"></span>
             </div>
-            <script>
-                document.addEventListener('htmx:afterOnLoad', function(evt) {
-                    if (evt.detail.target.id === 'current-song') {
-                        const audioPlayer = document.getElementById('audio-player');
-                        audioPlayer.src = "{{ current_song.audio_url }}";
-                    }
-                });
-            </script>
        </div>
     </div>
     
@@ -47,24 +35,24 @@
                     }
                 "
                 x-bind:class="{ 'active': isPlaying }"
-                hx-post="/toggle-play"
                 hx-swap="none">
             <span class="play-icon" x-text="isPlaying ? '⏸' : '▶'"></span>
         </button>
         <button class="control-btn skip-btn" 
-                hx-post="/skip-song"
-                hx-swap="none">
+                x-on:click="skipSong()">
             <span class="skip-icon">⏭</span>
         </button>
     </div>
     
+    <input type="hidden" name="currentSongId" x-model="currentSongId" />
     <div class="queue-section">
         <h2 class="queue-title">Next Up</h2>
         <div class="queue-list"
              id="queue-container"
              hx-get="/queue"
-             hx-trigger="load, every 5s"
-             hx-swap="morph">
+             hx-trigger="load, every 5s, refresh"
+             hx-swap="innerHTML"
+             hx-include="[name='currentSongId']">
         </div>
     </div>
 </div>

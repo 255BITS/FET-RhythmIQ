@@ -8,11 +8,12 @@ import uuid
 pool = None
 
 class Song:
-    def __init__(self, id, name, created_at, status, details, image_url: Optional[str] = None, image_large_url: Optional[str] = None, video_url: Optional[str] = None, audio_url: Optional[str] = None, generation_uuid = None):
+    def __init__(self, id, name, created_at, status, details, image_url: Optional[str] = None, image_large_url: Optional[str] = None, video_url: Optional[str] = None, audio_url: Optional[str] = None, generation_uuid = None, listens = None):
         self.id = id
         self.name = name
         self.created_at = created_at
         self.status = status
+        self.listens = listens
         try:
             self.details = json.loads(details) if isinstance(details, str) else details
         except json.JSONDecodeError:
@@ -54,7 +55,7 @@ class Song:
         async with pool.acquire() as conn:
             row = await conn.fetchrow(
                 "SELECT * FROM songs WHERE id = $1",
-                song_id
+                int(song_id)
             )
         if row:
             return cls(*row)
@@ -65,17 +66,20 @@ class Song:
         async with pool.acquire() as conn:
             rows = await conn.fetch("""
                 SELECT * FROM (
-                    SELECT DISTINCT ON (generation_uuid) * 
+                    SELECT DISTINCT ON (generation_uuid) *
                     FROM songs
-                    WHERE ((status = 'complete' OR (created_at >= $1::timestamp AND created_at >= NOW() - INTERVAL '5 minutes'))
-                           AND generation_uuid != $2)
+                    WHERE created_at >= $1::timestamp
+                    AND (
+                        status = 'complete'
+                        OR (created_at >= NOW() - INTERVAL '5 minutes' AND status != 'complete')
+                    )
+                    AND generation_uuid != $2
                     ORDER BY generation_uuid, created_at DESC
                 ) AS subquery
                 ORDER BY created_at ASC
                 LIMIT $3
             """, song.created_at, song.generation_uuid, limit)
         return [cls(*row) for row in rows]
-
     @classmethod
     async def get_all(cls):
         async with pool.acquire() as conn:
@@ -84,6 +88,7 @@ class Song:
 
     @classmethod
     async def last_complete(cls, offset):
+        offset *= 2 #hack
         async with pool.acquire() as conn:
             # Fetch the Nth last completed song
             rows = await conn.fetch(
@@ -158,6 +163,13 @@ class Song:
             )
         self.image_url, self.image_large_url, self.video_url, self.audio_url = image_url, image_large_url, video_url, audio_url
 
+    async def increment_listen_count(self):
+        async with pool.acquire() as conn:
+            await conn.execute(
+                "UPDATE songs SET listens = listens + 1 WHERE id = $1",
+                self.id
+            )
+        self.listens += 1
 
 async def init_db(pool_instance):
     global pool
@@ -176,6 +188,7 @@ async def init_db(pool_instance):
             ALTER TABLE songs ADD COLUMN IF NOT EXISTS video_url TEXT;
             ALTER TABLE songs ADD COLUMN IF NOT EXISTS audio_url TEXT;
             ALTER TABLE songs ADD COLUMN IF NOT EXISTS generation_uuid UUID;
+            ALTER TABLE songs ADD COLUMN IF NOT EXISTS listens INTEGER DEFAULT 0;
             ALTER TABLE songs DROP COLUMN IF EXISTS tags;
         """)
 

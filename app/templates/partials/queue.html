@@ -1,6 +1,11 @@
 <div class="queue-items">
     {% for song in songs %}
-    <div class="queue-item">
+    <div class="queue-item"
+      data-song-id="{{ song.id }}"
+      data-audio-url="{{ song.audio_url }}"
+      data-name="{{ song.name }}"
+      data-style="{{ song.details.style }}"
+      data-image-url="{{ song.image_large_url|default('/static/images/placeholder.jpg', true) }}">
         <img src="{{ song.image_url|default('/static/images/placeholder.jpg', true) }}" 
              alt="Album Cover" 
              class="queue-cover-image">

@@ -52,9 +52,10 @@ async def generate_song():
 
 @app.route('/queue')
 async def update_queue():
-    current_song = await Song.last_complete(3)
+    current_song_id = request.args.get("currentSongId")
+    current_song = await Song.get(current_song_id)
     songs = await Song.get_songs_after(current_song)
-    return await render_template('partials/queue.html', songs=songs)
+    return await render_template('partials/queue.html', songs=songs, song=current_song)
 
 @app.route('/stream_music')
 async def stream_music():
@@ -67,14 +68,21 @@ async def stream_music():
     
     return app.response_class(generate(), mimetype='text/event-stream')
 
-@app.route('/api/skip_song', methods=['POST'])
-async def skip_song():
-    # Logic to skip to the next song
-    return jsonify({"status": "success"})
-
 @app.route('/song/<id>/listen', methods=['POST'])
 async def listen(id):
-    return jsonify({"status": "success"})
+    song = await Song.get(id)
+    if song:
+        await song.increment_listen_count()
+        songs_after = await Song.get_songs_after(song)
+        print("Listen!", len(songs_after))
+        if len(songs_after) < 3:
+            generation_uuid = str(uuid.uuid4())
+            song1 = await Song.create(name="New Song 1", status="generating", generation_uuid=generation_uuid)
+            song2 = await Song.create(name="New Song 2", status="generating", generation_uuid=generation_uuid)
+            asyncio.create_task(generate_song_with_agent([song1, song2]))
+ 
+        return jsonify({"status": "success"})
+    return jsonify({"status": "error", "message": "Song not found"}), 404
 
 # New route to generate song using the agent
 async def generate_song_with_agent(songs):
