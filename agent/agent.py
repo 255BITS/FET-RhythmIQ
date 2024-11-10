@@ -41,8 +41,16 @@ class BroadcastSongResponse(Model):
 GenerateAudioRequest = BroadcastSongResponse
 
 class GenerateAudioResponse(Model):
-    audio_url: str
-    image_url: str
+    status: str
+    error: str
+    audio_url_1: str
+    image_url_1: str
+    video_url_1: str
+    image_large_url_1: str
+    audio_url_2: str
+    image_url_2: str
+    video_url_2: str
+    image_large_url_2: str
 
 # Define protocol
 proto = Protocol(name="SongwriterProtocol", version="1.0")
@@ -144,79 +152,100 @@ def poll_until_complete(song_ids):
             raise Exception("Failed to poll for audio.")
 
 @singer.on_rest_post("/sing", GenerateAudioRequest, Response)
-async def handle_sing_post(ctx: Context, req: GenerateAudioRequest) -> Response:
+async def handle_sing_post(ctx: Context, req: GenerateAudioRequest) -> GenerateAudioResponse:
     ctx.logger.info(f"Received /sing POST request with data: {req}")
+    # Use the song data from the request
+    song_data = {
+        'title': req.title,
+        'lyrics': req.lyrics,
+        'style': req.style,
+        'negative_style': req.negative_style
+    }
 
-    song_ids = generate_audio(
-        title=req.title,
-        lyrics=req.lyrics,
-        style=req.style,
-        negative_style=req.negative_style
-    )
-    if song_ids:
-        ctx.logger.info(f"Song IDs received: {song_ids}")
-        try:
-            song_data = poll_until_complete(song_ids)
-            # Extract required information
-            statuses = [item['status'] for item in song_data]
-            audio_urls = [item.get('audio_url') for item in song_data]
-            image_urls = [item.get('image_url') for item in song_data]
-            video_urls = [item.get('video_url') for item in song_data]
-            image_large_urls = [item.get('image_large_url') for item in song_data]
-
-            response_text = (
-                f"statuses: {statuses}, "
-                f"audio_urls: {audio_urls}, "
-                f"image_urls: {image_urls}, "
-                f"video_urls: {video_urls}, "
-                f"image_large_urls: {image_large_urls}"
-            )
-            return Response(
-                text=response_text,
-                agent_address=ctx.agent.address,
-                timestamp=int(time.time()),
-            )
-        except Exception as e:
-            ctx.logger.error(f"Error during polling: {e}")
-            return Response(
-                text=f"Error during polling: {e}",
-                agent_address=ctx.agent.address,
-                timestamp=int(time.time()),
-            )
-    else:
-        ctx.logger.error("Failed to initiate audio generation.")
-        return Response(
-            text="Failed to initiate audio generation.",
-            agent_address=ctx.agent.address,
-            timestamp=int(time.time()),
-        )
+    # Generate the audio response
+    return await generate_audio_response(ctx, song_data)
 
 @audio_proto.on_message(model=GenerateAudioRequest, replies=GenerateAudioResponse)
 async def handle_generate_audio(ctx: Context, sender: str, msg: GenerateAudioRequest):
     ctx.logger.info(f"Received audio generation request with data: {msg}")
+    # Use the song data from the message
+    song_data = {
+        'title': msg.title,
+        'lyrics': msg.lyrics,
+        'style': msg.style,
+        'negative_style': msg.negative_style
+    }
+
+    # Generate the audio response
+    response = await generate_audio_response(ctx, song_data)
+
+    # Send the response back to the sender
+    await ctx.send(sender, response)
+
+async def generate_audio_response(ctx: Context, song_data: dict) -> GenerateAudioResponse:
     song_ids = generate_audio(
-        title=msg.title,
-        lyrics=msg.lyrics,
-        style=msg.style,
-        negative_style=msg.negative_style
+        title=song_data.get('title', ''),
+        lyrics=song_data.get('lyrics', ''),
+        style=song_data.get('style', ''),
+        negative_style=song_data.get('negative_style', '')
     )
     if song_ids:
         ctx.logger.info(f"Song IDs received: {song_ids}")
         try:
-            audio_url, image_url = poll_for_audio(song_ids)
-            response = GenerateAudioResponse(
-                audio_url=audio_url,
-                image_url=image_url
+            song_data_list = poll_until_complete(song_ids)
+            # Extract required information
+            audio_url_1 = song_data_list[0].get('audio_url')
+            image_url_1 = song_data_list[0].get('image_url')
+            video_url_1 = song_data_list[0].get('video_url')
+            image_large_url_1 = song_data_list[0].get('image_large_url')
+            audio_url_2 = song_data_list[1].get('audio_url')
+            image_url_2 = song_data_list[1].get('image_url')
+            video_url_2 = song_data_list[1].get('video_url')
+            image_large_url_2 = song_data_list[1].get('image_large_url')
+            return GenerateAudioResponse(
+                status="complete",
+                error="",
+                audio_url_1=audio_url_1,
+                image_url_1=image_url_1,
+                video_url_1=video_url_1,
+                image_large_url_1=image_large_url_1,
+                audio_url_2=audio_url_2,
+                image_url_2=image_url_2,
+                video_url_2=video_url_2,
+                image_large_url_2=image_large_url_2
             )
-            await ctx.send(sender, response)
         except Exception as e:
             ctx.logger.error(f"Error during polling: {e}")
+            return GenerateAudioResponse(
+                status="error",
+                error=f"Error during polling: {e}",
+                audio_url_1="",
+                image_url_1="",
+                video_url_1="",
+                image_large_url_1="",
+                audio_url_2="",
+                image_url_2="",
+                video_url_2="",
+                image_large_url_2=""
+            )
     else:
         ctx.logger.error("Failed to initiate audio generation.")
+        return GenerateAudioResponse(
+            status="error",
+            error="Failed to intiate audio generation.",
+            audio_url_1="",
+            image_url_1="",
+            video_url_1="",
+            image_large_url_1="",
+            audio_url_2="",
+            image_url_2="",
+            video_url_2="",
+            image_large_url_2=""
+        )
 
 # Combined endpoint that takes no arguments, runs lyricist and singer in sequence
-@singer.on_rest_post("/orchestrate", EmptyRequest, Response)
-async def handle_orchestrate_post(ctx: Context, req: EmptyRequest) -> Response:
+@singer.on_rest_post("/orchestrate", EmptyRequest, GenerateAudioResponse)
+async def handle_orchestrate_post(ctx: Context, req: EmptyRequest) -> GenerateAudioResponse:
     ctx.logger.info("Received orchestrate request")
 
     # Step 1: Generate lyrics using the lyricist
@@ -225,43 +254,20 @@ async def handle_orchestrate_post(ctx: Context, req: EmptyRequest) -> Response:
 
     if not song_data:
         ctx.logger.error("Failed to generate song data in lyricist.")
-        return Response(
-            text="Failed to generate song lyrics.",
-            agent_address=ctx.agent.address,
-            timestamp=int(time.time()),
+        return GenerateAudioResponse(
+            status="error",
+            error="Failed to generate song data",
+            audio_url_1="",
+            image_url_1="",
+            video_url_1="",
+            image_large_url_1="",
+            audio_url_2="",
+            image_url_2="",
+            video_url_2="",
+            image_large_url_2=""
         )
-
-    # Step 2: Generate audio using the singer
-    song_ids = generate_audio(
-        title=song_data.get('title', ''),
-        lyrics=song_data.get('lyrics', ''),
-        style=song_data.get('style', ''),
-        negative_style=song_data.get('negative_style', '')
-    )
-    if song_ids:
-        try:
-            song_data_list = poll_until_complete(song_ids)
-            audio_url = song_data_list[0].get('audio_url')
-            image_url = song_data_list[0].get('image_url')
-            return Response(
-                text=f"Orchestrate completed. Audio URL: {audio_url}, Image URL: {image_url}",
-                agent_address=ctx.agent.address,
-                timestamp=int(time.time()),
-            )
-        except Exception as e:
-            ctx.logger.error(f"Error during orchestrate polling: {e}")
-            return Response(
-                text=f"Error during orchestrate polling: {e}",
-                agent_address=ctx.agent.address,
-                timestamp=int(time.time()),
-            )
-    else:
-        ctx.logger.error("Failed to initiate audio generation in orchestrate.")
-        return Response(
-            text="Failed to initiate audio generation in orchestrate.",
-            agent_address=ctx.agent.address,
-            timestamp=int(time.time()),
-        )
+    # Step 2: Generate audio response using the shared function
+    return await generate_audio_response(ctx, song_data)
 
 # Include protocol in the singer agent
 singer.include(audio_proto)
