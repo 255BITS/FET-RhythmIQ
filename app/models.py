@@ -117,6 +117,7 @@ async def init_db(pool_instance):
             ALTER TABLE songs ADD COLUMN IF NOT EXISTS image_large_url TEXT;
             ALTER TABLE songs ADD COLUMN IF NOT EXISTS video_url TEXT;
             ALTER TABLE songs ADD COLUMN IF NOT EXISTS audio_url TEXT;
+            ALTER TABLE songs DROP COLUMN IF EXISTS tags;
         """)
 
 async def get_db_pool(db_url):
