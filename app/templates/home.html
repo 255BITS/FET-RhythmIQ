@@ -4,7 +4,7 @@
 <div class="player-content" x-data="{ isPlaying: false }">
     <div class="now-playing">
         <div class="current-track-container">
-            <img src="{{ current_song.cover_image|default('/static/images/placeholder.jpg') }}" 
+            <img src="{{ current_song.image_large_url|default('/static/images/placeholder.jpg') }}"
                  alt="Album Cover" 
                  class="cover-image">
             <div class="track-info">

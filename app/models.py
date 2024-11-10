@@ -56,10 +56,13 @@ class Song:
     @classmethod
     async def get_recent(cls, limit=5):
         async with pool.acquire() as conn:
-            rows = await conn.fetch(
-                "SELECT * FROM songs ORDER BY created_at DESC LIMIT $1",
-                limit
-            )
+            rows = await conn.fetch("""
+                SELECT * FROM songs
+                WHERE status = 'complete'
+                   OR created_at >= (NOW() - INTERVAL '5 minutes')
+                ORDER BY created_at DESC
+                LIMIT $1
+            """, limit)
         return [cls(*row) for row in rows]
 
     @classmethod
