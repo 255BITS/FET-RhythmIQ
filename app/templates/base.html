@@ -7,10 +7,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+    <script src="https://unpkg.com/idiomorph@0.3.0/dist/idiomorph-ext.min.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600&display=swap" rel="stylesheet">
 </head>
-<body class="bg-[#1a1b26] text-gray-100 font-sans" x-data="{
+<body hx-ext="morph" class="bg-[#1a1b26] text-gray-100 font-sans" x-data="{
     isMuted: false,
     toggleMute() {
         this.isMuted = !this.isMuted; const audioPlayer = document.getElementById('audio-player'); if (audioPlayer) { audioPlayer.muted = this.isMuted; }
