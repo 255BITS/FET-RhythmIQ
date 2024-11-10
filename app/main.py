@@ -5,6 +5,16 @@ import httpx
 import os
 import json
 
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logging.getLogger("httpcore.http11").setLevel(logging.WARNING)
+logging.getLogger("asyncio").setLevel(logging.WARNING)
+logging.getLogger("httpx").setLevel(logging.WARNING)
+
+
 app = Quart(__name__)
 
 DATABASE_URL=os.getenv("DATABASE_URL", "postgresql://rhythmiq:rhythmiq@localhost:5432/rhythmiq")
@@ -23,19 +33,12 @@ async def create_song():
 
 @app.route('/generate_song', methods=['POST'])
 async def generate_song():
-    song = await Song.create(name="New Song", status="generating")
-    asyncio.create_task(generate_song_task(song))
-    return jsonify({"id": song.id, "name": song.name, "status": song.status})
+    song1 = await Song.create(name="New Song 1", status="generating")
+    song2 = await Song.create(name="New Song 2", status="generating")
+    asyncio.create_task(generate_song_with_agent([song1, song2]))
+    return jsonify([{"id": song1.id, "name": song1.name, "status": song1.status}, {"id": song2.id, "name": song2.name, "status": song2.status}])
 
-async def generate_song_task(song):
-    # Simulate AI song generation
-    await asyncio.sleep(10)
-    song.status = "complete"
-    song.details = json.dumps({"duration": "3:30", "genre": "Pop"})
-    song.tags = json.dumps(["upbeat", "electronic"])
-    await song.save()
-
-@app.route('/update_queue')
+@app.route('/queue')
 async def update_queue():
     songs = await Song.get_recent(limit=5)
     return await render_template('partials/queue.html', songs=songs)
@@ -58,7 +61,7 @@ async def skip_song():
 
 # New route to generate song using the agent
 @app.route('/generate_song_with_agent', methods=['POST'])
-async def generate_song_with_agent():
+async def generate_song_with_agent(songs):
     """
     Endpoint to generate songs by interacting with the /write_song and /sing endpoints.
     This process involves:
@@ -66,55 +69,97 @@ async def generate_song_with_agent():
     2. Passing the lyrics to /sing to generate media URLs for two songs.
     3. Creating two Song instances with the same lyrics but different media URLs.
     """
-    logging.info("generate_song_with_agent endpoint called.")
 
     try:
         async with httpx.AsyncClient() as client:
             # Step 1: Call /write_song to generate lyrics
             logging.debug("Calling /write_song endpoint to generate lyrics.")
-            response_write_song = await client.post("http://localhost:8000/write_song", json={})
+            for song in songs:
+                await song.update_status("writing lyrics")
+
+            response_write_song = await client.post("http://localhost:8000/write_song", json={"instruction":""}, timeout=600)
 
             if response_write_song.status_code == 200:
                 lyrics_result = response_write_song.json()
-                lyrics = lyrics_result.get('lyrics', '')
-                logging.info(f"Lyrics generated: {lyrics}")
+                logging.info(f"Lyrics generated: {lyrics_result}")
             else:
+                for song in songs:
+                    await song.update_status("error")
                 error_msg = f"Error in /write_song: {response_write_song.status_code}"
                 logging.error(error_msg)
                 return jsonify({"error": error_msg}), response_write_song.status_code
 
+            for song in songs:
+                await song.update_status("singing")
+                await song.update_details(lyrics_result)
+                await song.update_name(lyrics_result["title"])
             # Step 2: Pass lyrics to /sing to generate media URLs for two songs
             logging.debug("Calling /sing endpoint with generated lyrics.")
-            response_sing = await client.post("http://localhost:8000/sing", json={"lyrics": lyrics})
+            response_sing = await client.post("http://localhost:8000/sing", json=lyrics_result, timeout=600)
 
             if response_sing.status_code == 200:
                 sing_results = response_sing.json()
+                print(sing_results)
                 # Expecting sing_results to be a list of two dictionaries
                 if not isinstance(sing_results, list) or len(sing_results) != 2:
-                    error_msg = "Invalid response format from /sing. Expected a list of two song media data."
+                    error_msg = f"Invalid response format from /sing. Expected a list of two song media data. got {sing_results}"
                     logging.error(error_msg)
                     return jsonify({"error": error_msg}), 500
 
                 logging.info("Media URLs received from /sing endpoint.")
             else:
-                error_msg = f"Error in /sing: {response_sing.status_code}"
+                for song in songs:
+                    await song.update_status("error singing")
+                error_msg = f"Error in /sing: {response_sing.status_code} {response_sing.text}"
                 logging.error(error_msg)
                 return jsonify({"error": error_msg}), response_sing.status_code
 
             # Step 3: Create two Song instances with the same lyrics but different media URLs
             songs_created = []
-            for idx, sing_result in enumerate(sing_results, start=1):
-                song = await Song.create(
-                    name=f"Generated Song {idx}",
-                    status="complete",
-                    details={"lyrics": lyrics},
+            for song, sing_result in zip(songs, sing_results):
+                await song.update_media_urls(
                     image_url=sing_result.get('image_url'),
                     image_large_url=sing_result.get('image_large_url'),
                     video_url=sing_result.get('video_url'),
                     audio_url=sing_result.get('audio_url')
                 )
-                songs_created.append(song)
+                # Final update status
+                await song.update_status("complete")
                 logging.info(f"Created Song ID: {song.id} with media URLs from /sing.")
+            # Parsing sing_results as a single dictionary with multiple URLs
+            if not isinstance(sing_results, dict):
+                error_msg = f"Invalid response format from /sing. Expected a dictionary with media URLs. got {sing_results}"
+                logging.error(error_msg)
+                for song in songs:
+                    await song.update_status("error")
+                return jsonify({"error": error_msg}), 500
+
+            logging.info("Media URLs received from /sing endpoint.")
+
+            # Extract media URLs for each song
+            songs_created = []
+            for idx, song in enumerate(songs, start=1):
+                image_url = sing_results.get(f'image_url_{idx}')
+                image_large_url = sing_results.get(f'image_large_url_{idx}')
+                video_url = sing_results.get(f'video_url_{idx}')
+                audio_url = sing_results.get(f'audio_url_{idx}')
+
+                if not all([image_url, image_large_url, video_url, audio_url]):
+                    error_msg = f"Missing media URLs for song {idx} in sing_results."
+                    logging.error(error_msg)
+                    await song.update_status("error")
+                    continue
+
+                await song.update_media_urls(
+                    image_url=image_url,
+                    image_large_url=image_large_url,
+                    video_url=video_url,
+                    audio_url=audio_url
+                )
+                # Final update status
+                await song.update_status("complete")
+                logging.info(f"Created Song ID: {song.id} with media URLs from /sing.")
+                songs_created.append(song)
 
             # Optionally, you can aggregate these songs or perform additional actions here
 

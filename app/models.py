@@ -40,7 +40,7 @@ class Song:
                 """,
                 name, datetime.now(), status, json.dumps(details), image_url, image_large_url, video_url, audio_url
             )
-        return cls(*row, image_url=row.get('image_url'), image_large_url=row.get('image_large_url'), video_url=row.get('video_url'), audio_url=row.get('audio_url'))
+        return cls(*row)
 
     @classmethod
     async def get(cls, song_id):
@@ -54,10 +54,27 @@ class Song:
         return None
 
     @classmethod
+    async def get_recent(cls, limit=5):
+        async with pool.acquire() as conn:
+            rows = await conn.fetch(
+                "SELECT * FROM songs ORDER BY created_at DESC LIMIT $1",
+                limit
+            )
+        return [cls(*row) for row in rows]
+
+    @classmethod
     async def get_all(cls):
         async with pool.acquire() as conn:
             rows = await conn.fetch("SELECT * FROM songs ORDER BY created_at DESC")
         return [cls(*row) for row in rows]
+
+    async def update_name(self, name):
+        async with pool.acquire() as conn:
+            await conn.execute(
+                "UPDATE songs SET name = $1 WHERE id = $2",
+                name, self.id
+            )
+        self.status = name
 
     async def update_status(self, new_status):
         async with pool.acquire() as conn:
@@ -74,6 +91,15 @@ class Song:
                 json.dumps(new_details), self.id
             )
         self.details = new_details
+
+    async def update_media_urls(self, image_url=None, image_large_url=None, video_url=None, audio_url=None):
+        async with pool.acquire() as conn:
+            await conn.execute(
+                "UPDATE songs SET image_url = $1, image_large_url = $2, video_url = $3, audio_url = $4 WHERE id = $5",
+                image_url, image_large_url, video_url, audio_url, self.id
+            )
+        self.image_url, self.image_large_url, self.video_url, self.audio_url = image_url, image_large_url, video_url, audio_url
+
 
 async def init_db(pool_instance):
     global pool

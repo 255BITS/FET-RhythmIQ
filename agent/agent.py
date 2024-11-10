@@ -154,7 +154,7 @@ def poll_until_complete(song_ids):
         else:
             raise Exception("Failed to poll for audio.")
 
-@singer.on_rest_post("/sing", GenerateAudioRequest, Response)
+@singer.on_rest_post("/sing", GenerateAudioRequest, GenerateAudioResponse)
 async def handle_sing_post(ctx: Context, req: GenerateAudioRequest) -> GenerateAudioResponse:
     ctx.logger.info(f"Received /sing POST request with data: {req}")
     # Use the song data from the request
@@ -164,7 +164,6 @@ async def handle_sing_post(ctx: Context, req: GenerateAudioRequest) -> GenerateA
         'style': req.style,
         'negative_style': req.negative_style
     }
-
     # Generate the audio response
     return await generate_audio_response(ctx, song_data)
 
