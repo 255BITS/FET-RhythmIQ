@@ -13,7 +13,11 @@ class Song:
         self.name = name
         self.created_at = created_at
         self.status = status
-        self.details = details
+        try:
+            self.details = json.loads(details) if isinstance(details, str) else details
+        except json.JSONDecodeError:
+            self.details = {}
+
         self.image_url = image_url
         self.image_large_url = image_large_url
         self.video_url = video_url
@@ -63,7 +67,7 @@ class Song:
                 SELECT * FROM (
                     SELECT DISTINCT ON (generation_uuid) * 
                     FROM songs
-                    WHERE ((status = 'complete' OR created_at >= $1::timestamp) 
+                    WHERE ((status = 'complete' OR (created_at >= $1::timestamp AND created_at >= NOW() - INTERVAL '5 minutes'))
                            AND generation_uuid != $2)
                     ORDER BY generation_uuid, created_at DESC
                 ) AS subquery

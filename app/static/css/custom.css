@@ -195,12 +195,25 @@ body {
   gap: 0.5rem;
 }
 
-.genre-tag, .status-tag {
+.status-tag, .style-tag, .style-tag-full {
   font-size: 0.75rem;
   padding: 0.25rem 0.5rem;
   border-radius: 1rem;
   background-color: rgba(157, 78, 221, 0.2);
   color: var(--accent-purple);
+}
+
+.style-tag {
+  width: 20em;
+  white-space: nowrap; /* Prevent wrapping */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.style-tag-full {
+  white-space: nowrap; /* Prevent wrapping */
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Volume Control */
