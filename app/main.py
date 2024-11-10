@@ -25,7 +25,8 @@ async def setup():
 
 @app.route('/')
 async def home():
-    return await render_template('home.html')
+    current_song = Song.last_complete(3)
+    return await render_template('home.html', current_song=current_song)
 
 @app.route('/create_song')
 async def create_song():

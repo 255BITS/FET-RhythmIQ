@@ -1,10 +1,15 @@
 <div class="queue-items">
     {% for song in songs %}
     <div class="queue-item">
-        <span class="song-name">{{ song.name }}</span>
-        <div class="song-info">
-            <span class="genre-tag">{{ song.genre }}</span>
-            <span class="ai-tag">AI Generated</span>
+        <img src="{{ song.cover_image|default('/static/images/placeholder.jpg') }}" 
+             alt="Album Cover" 
+             class="queue-cover-image">
+        <div class="song-details">
+            <span class="song-name">{{ song.name }}</span>
+            <div class="song-info">
+                <span class="genre-tag">{{ song.genre }}</span>
+                <span class="status-tag">{{ song.status }}</span>
+            </div>
         </div>
     </div>
     {% endfor %}

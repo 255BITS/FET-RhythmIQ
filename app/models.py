@@ -68,6 +68,50 @@ class Song:
             rows = await conn.fetch("SELECT * FROM songs ORDER BY created_at DESC")
         return [cls(*row) for row in rows]
 
+    @classmethod
+    async def last_complete(cls, offset):
+        async with pool.acquire() as conn:
+            # Fetch the Nth last completed song
+            rows = await conn.fetch(
+                """
+                SELECT * FROM songs
+                WHERE status = 'complete'
+                ORDER BY created_at DESC
+                LIMIT $1 OFFSET $2
+                """,
+                1, offset
+            )
+            
+        if rows:
+            # If we found a song at the offset, return it
+            return cls(*rows[0])
+        
+        # If no completed songs are found at that offset, return the last one if any exist
+        if offset > 0:
+            rows = await conn.fetch(
+                """
+                SELECT * FROM songs
+                WHERE status = 'complete'
+                ORDER BY created_at DESC
+                LIMIT 1
+                """
+            )
+            if rows:
+                return cls(*rows[0])
+
+        # No completed songs in the database; return a mock object
+        return cls(
+            id=None,
+            name="No Completed Song",
+            created_at=None,
+            status="completed",
+            details={"message": "Mock song - no completed songs available"},
+            image_url=None,
+            image_large_url=None,
+            video_url=None,
+            audio_url=None
+        )
+
     async def update_name(self, name):
         async with pool.acquire() as conn:
             await conn.execute(

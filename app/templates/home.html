@@ -2,22 +2,21 @@
 
 {% block content %}
 <div class="player-content" x-data="{ isPlaying: false }">
-    <div class="visualizer-container">
-        <div class="visualizer" id="audio-visualizer">
-            <!-- Bars will be generated via JS -->
-            {% for i in range(32) %}
-            <div class="visualizer-bar"></div>
-            {% endfor %}
-        </div>
-    </div>
-    
     <div class="now-playing">
-        <span class="label">Now Playing:</span>
-        <span class="song-title" id="current-song" 
-              hx-get="/current-song"
-              hx-trigger="load, every 5s">
-            AI Generated Synthwave
-        </span>
+        <div class="current-track-container">
+            <img src="{{ current_song.cover_image|default('/static/images/placeholder.jpg') }}" 
+                 alt="Album Cover" 
+                 class="cover-image">
+            <div class="track-info">
+                <span class="label">Now Playing:</span>
+                <span class="song-title" id="current-song" 
+                      hx-get="/current-song"
+                      hx-trigger="load, every 5s">
+                    {{ current_song.name|default('No track playing') }}
+                </span>
+                <span class="status-tag">{{ current_song.status }}</span>
+            </div>
+        </div>
     </div>
     
     <div class="progress-bar" id="song-progress"></div>
