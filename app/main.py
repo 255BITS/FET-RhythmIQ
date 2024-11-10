@@ -18,6 +18,7 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 app = Quart(__name__)
 
 DATABASE_URL=os.getenv("DATABASE_URL", "postgresql://rhythmiq:rhythmiq@localhost:5432/rhythmiq")
+AGENT_HOST = os.getenv("AGENT_HOST", "http://localhost:8258")
 
 @app.before_serving
 async def setup():
@@ -101,7 +102,7 @@ async def generate_song_with_agent(songs):
             for song in songs:
                 await song.update_status("writing lyrics")
 
-            response_write_song = await client.post("http://localhost:8000/write_song", json={"instruction":""}, timeout=600)
+            response_write_song = await client.post(f"{AGENT_HOST}/write_song", json={"instruction":""}, timeout=600)
 
             if response_write_song.status_code == 200:
                 lyrics_result = response_write_song.json()

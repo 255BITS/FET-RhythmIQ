@@ -6,6 +6,7 @@ services:
     environment:
       - ENV=production
       - DATABASE_URL=$DATABASE_URL
+      - AGENT_HOST=https://rhythmiqagent.255labs.xyz
 
     image: '532091552808.dkr.ecr.us-west-2.amazonaws.com/rhythmiq:1.0'
     deploy:
