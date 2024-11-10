@@ -53,7 +53,8 @@ def main():
 
     version = os.getenv('VERSION', '1.0')
     service_paths = {
-        'rhythmiq': './Dockerfile'
+        'rhythmiq': './Dockerfile',
+        'rhythmiqagent': '../agent/Dockerfile'
     }
     services = service_paths.keys()
 
