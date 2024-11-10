@@ -245,8 +245,8 @@ async def generate_audio_response(ctx: Context, song_data: dict) -> GenerateAudi
             image_large_url_2=""
         )
 
-@singer.on_rest_post("/", EmptyRequest, Response)
-async def handle_heartbeat(ctx: Context, req: EmptyRequest) -> Response:
+@singer.on_rest_get("/", Response)
+async def handle_heartbeat(ctx: Context) -> Response:
    return Response(
                 text="OK",
                 agent_address=ctx.agent.address,
