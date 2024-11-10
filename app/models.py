@@ -2,12 +2,13 @@ import asyncpg
 from datetime import datetime
 import json
 from typing import Optional
+import uuid
 
 # Define a global pool variable
 pool = None
 
 class Song:
-    def __init__(self, id, name, created_at, status, details, image_url: Optional[str] = None, image_large_url: Optional[str] = None, video_url: Optional[str] = None, audio_url: Optional[str] = None):
+    def __init__(self, id, name, created_at, status, details, image_url: Optional[str] = None, image_large_url: Optional[str] = None, video_url: Optional[str] = None, audio_url: Optional[str] = None, generation_uuid = None):
         self.id = id
         self.name = name
         self.created_at = created_at
@@ -17,6 +18,7 @@ class Song:
         self.image_large_url = image_large_url
         self.video_url = video_url
         self.audio_url = audio_url
+        self.generation_uuid = generation_uuid
 
     @classmethod
     async def create(cls, **kwargs):
@@ -30,15 +32,16 @@ class Song:
         image_large_url = kwargs.get("image_large_url")
         video_url = kwargs.get("video_url")
         audio_url = kwargs.get("audio_url")
+        generation_uuid = kwargs.get("generation_uuid", str(uuid.uuid4()))
 
         async with pool.acquire() as conn:
             row = await conn.fetchrow(
                 """
-                INSERT INTO songs (name, created_at, status, details, image_url, image_large_url, video_url, audio_url)
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-                RETURNING id, name, created_at, status, details, image_url, image_large_url, video_url, audio_url
+                INSERT INTO songs (name, created_at, status, details, image_url, image_large_url, video_url, audio_url, generation_uuid)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+                RETURNING id, name, created_at, status, details, image_url, image_large_url, video_url, audio_url, generation_uuid
                 """,
-                name, datetime.now(), status, json.dumps(details), image_url, image_large_url, video_url, audio_url
+                name, datetime.now(), status, json.dumps(details), image_url, image_large_url, video_url, audio_url, generation_uuid
             )
         return cls(*row)
 
@@ -54,15 +57,19 @@ class Song:
         return None
 
     @classmethod
-    async def get_recent(cls, limit=5):
+    async def get_songs_after(cls, song, limit=5):
         async with pool.acquire() as conn:
             rows = await conn.fetch("""
-                SELECT * FROM songs
-                WHERE status = 'complete'
-                   OR created_at >= (NOW() - INTERVAL '5 minutes')
-                ORDER BY created_at DESC
-                LIMIT $1
-            """, limit)
+                SELECT * FROM (
+                    SELECT DISTINCT ON (generation_uuid) * 
+                    FROM songs
+                    WHERE ((status = 'complete' OR created_at >= $1::timestamp) 
+                           AND generation_uuid != $2)
+                    ORDER BY generation_uuid, created_at DESC
+                ) AS subquery
+                ORDER BY created_at ASC
+                LIMIT $3
+            """, song.created_at, song.generation_uuid, limit)
         return [cls(*row) for row in rows]
 
     @classmethod
@@ -85,22 +92,22 @@ class Song:
                 1, offset
             )
             
-        if rows:
-            # If we found a song at the offset, return it
-            return cls(*rows[0])
-        
-        # If no completed songs are found at that offset, return the last one if any exist
-        if offset > 0:
-            rows = await conn.fetch(
-                """
-                SELECT * FROM songs
-                WHERE status = 'complete'
-                ORDER BY created_at DESC
-                LIMIT 1
-                """
-            )
             if rows:
+                # If we found a song at the offset, return it
                 return cls(*rows[0])
+            
+            # If no completed songs are found at that offset, return the last one if any exist
+            if offset > 0:
+                rows = await conn.fetch(
+                    """
+                    SELECT * FROM songs
+                    WHERE status = 'complete'
+                    ORDER BY created_at DESC
+                    LIMIT 1
+                    """
+                )
+                if rows:
+                    return cls(*rows[0])
 
         # No completed songs in the database; return a mock object
         return cls(
@@ -164,6 +171,7 @@ async def init_db(pool_instance):
             ALTER TABLE songs ADD COLUMN IF NOT EXISTS image_large_url TEXT;
             ALTER TABLE songs ADD COLUMN IF NOT EXISTS video_url TEXT;
             ALTER TABLE songs ADD COLUMN IF NOT EXISTS audio_url TEXT;
+            ALTER TABLE songs ADD COLUMN IF NOT EXISTS generation_uuid UUID;
             ALTER TABLE songs DROP COLUMN IF EXISTS tags;
         """)
 

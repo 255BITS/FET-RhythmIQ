@@ -1,7 +1,7 @@
 <div class="queue-items">
     {% for song in songs %}
     <div class="queue-item">
-        <img src="{{ song.image_url|default('/static/images/placeholder.jpg') }}" 
+        <img src="{{ song.image_url|default('/static/images/placeholder.jpg', true) }}" 
              alt="Album Cover" 
              class="queue-cover-image">
         <div class="song-details">

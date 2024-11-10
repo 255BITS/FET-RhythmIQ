@@ -4,7 +4,7 @@ import asyncio
 import httpx
 import os
 import json
-
+import uuid
 import logging
 
 # Configure logging
@@ -44,14 +44,16 @@ async def create_song():
 
 @app.route('/generate_song', methods=['POST'])
 async def generate_song():
-    song1 = await Song.create(name="New Song 1", status="generating")
-    song2 = await Song.create(name="New Song 2", status="generating")
+    generation_uuid = str(uuid.uuid4())
+    song1 = await Song.create(name="New Song 1", status="generating", generation_uuid=generation_uuid)
+    song2 = await Song.create(name="New Song 2", status="generating", generation_uuid=generation_uuid)
     asyncio.create_task(generate_song_with_agent([song1, song2]))
     return jsonify([{"id": song1.id, "name": song1.name, "status": song1.status}, {"id": song2.id, "name": song2.name, "status": song2.status}])
 
 @app.route('/queue')
 async def update_queue():
-    songs = await Song.get_recent(limit=5)
+    current_song = await Song.last_complete(3)
+    songs = await Song.get_songs_after(current_song)
     return await render_template('partials/queue.html', songs=songs)
 
 @app.route('/stream_music')
