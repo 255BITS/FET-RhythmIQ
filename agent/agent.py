@@ -245,6 +245,14 @@ async def generate_audio_response(ctx: Context, song_data: dict) -> GenerateAudi
             image_large_url_2=""
         )
 
+@singer.on_rest_post("/", EmptyRequest, Response)
+async def handle_heartbeat(ctx: Context, req: EmptyRequest) -> Response:
+   return Response(
+                text="OK",
+                agent_address=ctx.agent.address,
+                timestamp=int(time.time()),
+   )
+
 # Combined endpoint that takes no arguments, runs lyricist and singer in sequence
 @singer.on_rest_post("/orchestrate", EmptyRequest, GenerateAudioResponse)
 async def handle_orchestrate_post(ctx: Context, req: EmptyRequest) -> GenerateAudioResponse:
