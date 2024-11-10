@@ -18,8 +18,6 @@
                  alt="Album Cover" 
                  class="cover-image">
             <div class="track-info">
-                <audio id="audio-player" x-ref="audioPlayer" src="{{ current_song.audio_url }}" x-on:timeupdate="updateProgress()"></audio>
-
                 <span class="label">Now Playing:</span>
                 <span class="song-title" id="current-song" 
                       hx-get="/current-song"
@@ -36,7 +34,7 @@
                     }
                 });
             </script>
-        </div>
+       </div>
     </div>
     
     <div class="progress-bar" id="song-progress">

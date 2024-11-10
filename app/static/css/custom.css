@@ -210,25 +210,6 @@ body {
   gap: 0.75rem;
 }
 
-.volume-slider {
-  width: 100px;
-  height: 4px;
-  background-color: var(--border-color);
-  border-radius: 2px;
-  position: relative;
-}
-
-.volume-slider::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: 75%;
-  background-color: var(--accent-purple);
-  border-radius: 2px;
-}
-
 /* Status tags variations */
 .status-tag.generating {
   background-color: rgba(157, 78, 221, 0.2);
@@ -274,4 +255,61 @@ body {
   .song-info {
     justify-content: center;
   }
+}
+.volume-slider {
+  width: 100px;
+  appearance: none;
+  background: var(--border-color);
+  height: 4px;
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+  position: relative;
+}
+
+.volume-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  background: var(--accent-purple);
+  border-radius: 50%;
+  cursor: pointer;
+  position: relative;
+  z-index: 2;
+}
+
+.volume-slider::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  background: var(--accent-purple);
+  border-radius: 50%;
+  cursor: pointer;
+  position: relative;
+  z-index: 2;
+}
+
+.volume-control {
+  position: relative;
+}
+
+.volume-slider::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: var(--border-color);
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+}
+
+.volume-slider::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: var(--accent-purple);
+  width: var(--volume-percent, 50%);
+  height: 4px;
+  border-radius: 2px;
 }

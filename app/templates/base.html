@@ -16,6 +16,7 @@
         this.isMuted = !this.isMuted; const audioPlayer = document.getElementById('audio-player'); if (audioPlayer) { audioPlayer.muted = this.isMuted; }
     }
 }">
+  <audio id="audio-player" x-ref="audioPlayer" src="{{ current_song.audio_url }}" x-on:timeupdate="updateProgress()"></audio>
     <div class="max-w-4xl mx-auto p-6">
         <div class="retro-player-container">
             <div class="player-header">
@@ -24,9 +25,15 @@
                     <h1 class="retro-title">RhythmIQ</h1>
                 </div>
                 <div class="volume-control">
-                    <button x-on:click="toggleMute()" x-text="isMuted ? '🔇' : '🔊'" class="volume-icon"></button>
-                    <div class="volume-slider"></div>
+                    <button x-on:click="$refs.audioPlayer.muted = !$refs.audioPlayer.muted" x-text="$refs.audioPlayer.muted ? '🔇' : '🔊'" class="volume-icon"></button>
+                    <input 
+                        type="range" 
+                        min="0" max="1" 
+                        step="0.01" 
+                        x-on:input="$refs.audioPlayer.volume = $event.target.value; $event.target.style.setProperty('--volume-percent', ($event.target.value * 100) + '%')"
+                        class="volume-slider">
                 </div>
+
             </div>
 
             {% block content %}{% endblock %}
