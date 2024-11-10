@@ -72,6 +72,10 @@ async def skip_song():
     # Logic to skip to the next song
     return jsonify({"status": "success"})
 
+@app.route('/song/<id>/listen', methods=['POST'])
+async def listen(id):
+    return jsonify({"status": "success"})
+
 # New route to generate song using the agent
 async def generate_song_with_agent(songs):
     """

@@ -14,7 +14,7 @@
                       hx-trigger="load">
                     {{ current_song.name|default('No track playing') }}
                 </span>
-                <span class="style-tag-full">{{ current_song.details.style }}</span>
+               <span class="style-tag-full" id="current-song" data-song-id="{{ current_song.id }}">{{ current_song.details.style }}</span>
             </div>
             <script>
                 document.addEventListener('htmx:afterOnLoad', function(evt) {
@@ -39,6 +39,11 @@
                         $refs.audioPlayer.play();
                     } else {
                         $refs.audioPlayer.pause();
+                        isResumed = false;
+                    }
+                    if (isPlaying && !isResumed) {
+                        fetch(`/song/${currentSongId}/listen`, { method: 'POST' });
+                        isResumed = true;
                     }
                 "
                 x-bind:class="{ 'active': isPlaying }"

@@ -20,6 +20,11 @@
     currentTime: 0,
     duration: 0,
     progress: 0,
+    isResumed: false,
+    currentSongId: {{ current_song.id }},
+    updateSongId() {
+        this.isResumed = false; // reset play status on song change
+    },
     updateProgress() {
         this.currentTime = this.$refs.audioPlayer.currentTime;
         this.duration = this.$refs.audioPlayer.duration || 0;
@@ -36,7 +41,7 @@
     }
 }"
 }">
-  <audio id="audio-player" x-ref="audioPlayer" src="{{ current_song.audio_url }}" x-on:timeupdate="updateProgress()"></audio>
+  <audio id="audio-player" x-ref="audioPlayer" src="{{ current_song.audio_url }}" x-on:timeupdate="updateProgress()" x-on:loadstart="updateSongId()"></audio>
     <div class="max-w-4xl mx-auto p-6">
         <div class="retro-player-container">
             <div class="player-header">
