@@ -8,6 +8,8 @@
                  alt="Album Cover" 
                  class="cover-image">
             <div class="track-info">
+                <audio id="audio-player" x-ref="audioPlayer" src="{{ current_song.audio_url }}"></audio>
+
                 <span class="label">Now Playing:</span>
                 <span class="song-title" id="current-song" 
                       hx-get="/current-song"
@@ -16,6 +18,14 @@
                 </span>
                 <span class="status-tag">{{ current_song.status }}</span>
             </div>
+            <script>
+                document.addEventListener('htmx:afterOnLoad', function(evt) {
+                    if (evt.detail.target.id === 'current-song') {
+                        const audioPlayer = document.getElementById('audio-player');
+                        audioPlayer.src = "{{ current_song.audio_url }}";
+                    }
+                });
+            </script>
         </div>
     </div>
     
@@ -23,7 +33,14 @@
     
     <div class="controls">
         <button class="control-btn play-btn" 
-                x-on:click="isPlaying = !isPlaying"
+                x-on:click="
+                    isPlaying = !isPlaying;
+                    if (isPlaying) {
+                        $refs.audioPlayer.play();
+                    } else {
+                        $refs.audioPlayer.pause();
+                    }
+                "
                 x-bind:class="{ 'active': isPlaying }"
                 hx-post="/toggle-play"
                 hx-swap="none">

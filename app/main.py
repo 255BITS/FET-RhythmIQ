@@ -25,8 +25,18 @@ async def setup():
 
 @app.route('/')
 async def home():
-    current_song = Song.last_complete(3)
+    current_song = await Song.last_complete(3)
     return await render_template('home.html', current_song=current_song)
+
+# New route to get the current song details
+@app.route('/current_song')
+async def current_song_route():
+    current_song = await Song.last_complete(3)
+    return jsonify({
+        'name': current_song.name,
+        'status': current_song.status,
+        'audio_url': current_song.audio_url
+    })
 
 @app.route('/create_song')
 async def create_song():
