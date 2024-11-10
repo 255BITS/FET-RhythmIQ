@@ -29,16 +29,16 @@ class Response(Model):
     agent_address: str
 
 # Define the models
-class BroadcastSongRequest(Model):
+class WriteSongRequest(Model):
     instruction: str
 
-class BroadcastSongResponse(Model):
+class WriteSongResponse(Model):
     title: str
     lyrics: str
     style: str
     negative_style: str
 
-GenerateAudioRequest = BroadcastSongResponse
+GenerateAudioRequest = WriteSongResponse
 
 class GenerateAudioResponse(Model):
     status: str
@@ -55,14 +55,14 @@ class GenerateAudioResponse(Model):
 # Define protocol
 proto = Protocol(name="SongwriterProtocol", version="1.0")
 
-@proto.on_message(model=BroadcastSongRequest, replies=BroadcastSongResponse)
-async def handle_song_request(ctx: Context, sender: str, msg: BroadcastSongRequest):
+@proto.on_message(model=WriteSongRequest, replies=WriteSongResponse)
+async def handle_song_request(ctx: Context, sender: str, msg: WriteSongRequest):
     # Use prompt.py's generate_song function
     instruction = msg.instruction
     song_data = generate_song(instruction)
 
     if song_data:
-        response = BroadcastSongResponse(
+        response = WriteSongResponse(
             title=song_data.get('title', ''),
             lyrics=song_data.get('lyrics', ''),
             style=song_data.get('style', ''),
@@ -77,13 +77,16 @@ async def handle_song_request(ctx: Context, sender: str, msg: BroadcastSongReque
 lyricist.include(proto)
 
 
-@lyricist.on_rest_post("/rest/post", Request, Response)
-async def handle_post(ctx: Context, req: Request) -> Response:
-    ctx.logger.info("Received POST request")
-    return Response(
-        text=f"Received: {req.text}",
-        agent_address=ctx.agent.address,
-        timestamp=int(time.time()),
+@lyricist.on_rest_post("/write_song", WriteSongRequest, WriteSongResponse)
+async def handle_post(ctx: Context, req: WriteSongRequest) -> WriteSongResponse:
+    ctx.logger.info("Writing song")
+    instruction = req.instruction
+    song_data = generate_song(instruction)
+    return WriteSongResponse(
+        title=song_data.get('title', ''),
+        lyrics=song_data.get('lyrics', ''),
+        style=song_data.get('style', ''),
+        negative_style=song_data.get('negative_style', '')
     )
 
 # Define protocol for Singer agent
@@ -274,7 +277,7 @@ singer.include(audio_proto)
 
 
 # Initialize the bureau and add the lyricist agent
-bureau = Bureau(port=8000)
+bureau = Bureau(port=8000, endpoint="http://localhost:8000/submit")
 bureau.add(lyricist)
 bureau.add(singer)
 
