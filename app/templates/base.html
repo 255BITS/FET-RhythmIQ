@@ -22,9 +22,9 @@
     progress: 0,
     isResumed: false,
     currentSongId: {{ current_song.id }},
-    currentSongName: '{{ current_song.name|default('No track playing') }}',
-    currentSongStyle: '{{ current_song.details.style|default('') }}',
-    currentSongImage: '{{ current_song.image_large_url|default('/static/images/placeholder.jpg', true) }}',
+    currentSongName: '{{ current_song.name|default('No track playing')|jsescape }}',
+    currentSongStyle: '{{ current_song.details.style|default('')|jsescape }}',
+    currentSongImage: '{{ current_song.image_large_url|default('/static/images/placeholder.jpg', true)|jsescape }}',
     handleSongEnd() {
         this.advanceSong();
         //htmx.trigger('#queue-container', 'refresh');

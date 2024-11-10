@@ -181,5 +181,15 @@ async def generate_song_with_agent(songs):
         logging.exception("Exception occurred during generate_song_with_agent processing.")
         return jsonify({"error": f"Exception: {str(e)}"}), 500
 
+def js_escape(value):
+    """Escape characters that would interfere with JavaScript strings."""
+    return (
+        value.replace('\\', '\\\\')  # Escape backslashes
+             .replace("'", "\\'")     # Escape single quotes
+             .replace('"', '\\"')     # Escape double quotes
+    )
+
+app.jinja_env.filters['jsescape'] = js_escape
+
 if __name__ == '__main__':
     app.run(debug=True, port=8257)
