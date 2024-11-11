@@ -120,7 +120,7 @@ async def generate_song_with_agent(songs):
                 await song.update_name(lyrics_result["title"])
             # Step 2: Pass lyrics to /sing to generate media URLs for two songs
             logging.debug("Calling /sing endpoint with generated lyrics.")
-            response_sing = await client.post("http://localhost:8000/sing", json=lyrics_result, timeout=600)
+            response_sing = await client.post("{AGENT_HOST}/sing", json=lyrics_result, timeout=600)
 
             if response_sing.status_code == 200:
                 sing_results = response_sing.json()
