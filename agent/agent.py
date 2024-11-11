@@ -284,7 +284,7 @@ singer.include(audio_proto)
 
 
 # Initialize the bureau and add the lyricist agent
-bureau = Bureau(port=8258, endpoint="http://localhost:8258/submit")
+bureau = Bureau(port=8258, endpoint="https://rhythmiqagent.255labs.xyz/submit")
 bureau.add(lyricist)
 bureau.add(singer)
 
