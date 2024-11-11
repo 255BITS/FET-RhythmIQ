@@ -187,6 +187,7 @@ def js_escape(value):
         value.replace('\\', '\\\\')  # Escape backslashes
              .replace("'", "\\'")     # Escape single quotes
              .replace('"', '\\"')     # Escape double quotes
+             .replace("\n", ' ')     # Escape double quotes
     )
 
 app.jinja_env.filters['jsescape'] = js_escape
