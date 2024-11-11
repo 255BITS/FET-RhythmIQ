@@ -165,7 +165,7 @@ def generate_song(instruction=None):
     except ValueError as e:
         print(f"Configuration Error: {e}")
         return None
-    if instruction is None:
+    if instruction is None or instruction.strip() == "":
         instruction = load_random_instruction()
         if not instruction:
             print("Failed to load a random instruction.")
