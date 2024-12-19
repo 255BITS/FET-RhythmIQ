@@ -116,6 +116,11 @@
         .then(data => {
             this.isFavorite = data.is_favorite;
             this.favoriteCount = data.favorite_count;
+            if(this.isFavorite) {
+              this.lastFavoriteCount += 1;
+            } else {
+              this.lastFavoriteCount -= 1;
+            }
             if (!this.isFavorite) return;
             this.animateHeart();
         });
@@ -151,14 +156,19 @@
         heart.style.left = `${rect.left + rect.width / 2}px`;
         heart.style.top = `${rect.top + rect.height / 2}px`;
         
-        // Add some randomness
+        // Add randomness
         const randomScale = 0.9 + Math.random() * 0.2;
-        const randomDuration = 0.75 + Math.random() * 0.2;
+        const randomDuration = 1.2 + Math.random() * 0.3;
         const randomDelay = Math.random() * 0.1;
+        const randomX = (Math.random() - 0.5) * 50; // -25px to 25px
+        const randomRotate = (Math.random() - 0.5) * 30; // -15deg to 15deg
 
-        heart.style.transform = `translate(-50%, -50%)`;
         heart.style.animationDuration = `${randomDuration}s`;
         heart.style.animationDelay = `${randomDelay}s`;
+        
+        // Set CSS variables for random values
+        heart.style.setProperty('--random-x', `${randomX}px`);
+        heart.style.setProperty('--random-rotate', `${randomRotate}deg`);
 
         document.body.appendChild(heart);
 

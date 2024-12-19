@@ -356,22 +356,18 @@ body {
     cursor: pointer;
 }
 
+
 @keyframes float-heart {
     0% {
-        transform: translate(-50%, -50%) rotate(0deg);
+        transform: translate(-50%, -50%) scale(1) rotate(0deg);
         opacity: 1;
     }
-    25% {
-        transform: translate(calc(-50% - 10px), -160%) rotate(-5deg);
-    }
     50% {
-        transform: translate(-50%, -270%) rotate(0deg);
-    }
-    75% {
-        transform: translate(calc(-50% + 10px), -380%) rotate(5deg);
+        transform: translate(calc(-50% + var(--random-x, 0px)), -75px) scale(0.9) rotate(var(--random-rotate, 0deg));
+        opacity: 0.6;
     }
     100% {
-        transform: translate(-50%, -200px) rotate(0deg);
+        transform: translate(-50%, -100px) scale(0.8) rotate(0deg);
         opacity: 0;
     }
 }
@@ -379,7 +375,14 @@ body {
 .floating-heart {
     position: fixed;
     font-size: 24px;
-    animation: float-heart 1.5s ease-in-out forwards;
+    animation: float-heart 1.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+    pointer-events: none;
+}
+
+.floating-heart {
+    position: fixed;
+    font-size: 24px;
+    animation: float-heart 1.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
     pointer-events: none;
 }
 
