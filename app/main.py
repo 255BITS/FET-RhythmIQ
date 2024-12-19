@@ -1,5 +1,5 @@
-from quart import Quart, render_template, jsonify, request
-from models import Song, init_db, get_db_pool
+from quart import Quart, render_template, jsonify, request, session
+from models import Song, UserFavorite, init_db, get_db_pool
 import asyncio
 import httpx
 import os
@@ -19,25 +19,24 @@ app = Quart(__name__)
 
 DATABASE_URL=os.getenv("DATABASE_URL", "postgresql://rhythmiq:rhythmiq@localhost:5432/rhythmiq")
 AGENT_HOST = os.getenv("AGENT_HOST", "http://localhost:8258")
+APP_SECRET = os.getenv("APP_SECRET", "tempsecret123")
 
 @app.before_serving
 async def setup():
     await init_db(await get_db_pool(DATABASE_URL))
 
+
+@app.before_request
+async def before_request():
+    if 'temp_user_id' not in session:
+        session['temp_user_id'] = str(uuid.uuid4())
+
 @app.route('/')
 async def home():
+    user_id = session['temp_user_id']
     current_song = await Song.last_complete(3)
-    return await render_template('home.html', current_song=current_song)
-
-# New route to get the current song details
-@app.route('/current_song')
-async def current_song_route():
-    current_song = await Song.last_complete(3)
-    return jsonify({
-        'name': current_song.name,
-        'status': current_song.status,
-        'audio_url': current_song.audio_url
-    })
+    is_favorite = await UserFavorite.exists(user_id=user_id, song_id=current_song.id)
+    return await render_template('home.html', current_song=current_song, is_favorite=is_favorite)
 
 @app.route('/create_song')
 async def create_song():
@@ -84,6 +83,51 @@ async def listen(id):
  
         return jsonify({"status": "success"})
     return jsonify({"status": "error", "message": "Song not found"}), 404
+
+@app.route('/song/<int:id>/favorite', methods=['POST'])
+async def favorite_song(id):
+    user_id = session['temp_user_id']
+    song = await Song.get(id)
+    if not song:
+        return jsonify({"error": "Song not found"}), 404
+
+    favorite, created = await UserFavorite.get_or_create(user_id=user_id, song_id=id)
+    await song.update_favorite_count()
+
+    return jsonify({
+        "is_favorite": True,
+        "favorite_count": await song.get_favorite_count()
+    })
+
+@app.route('/song/<int:id>/unfavorite', methods=['POST'])
+async def unfavorite_song(id):
+    user_id = session['temp_user_id']
+    song = await Song.get(id)
+    if not song:
+        return jsonify({"error": "Song not found"}), 404
+
+    await UserFavorite.delete(user_id=user_id, song_id=id)
+    await song.update_favorite_count()
+
+    return jsonify({
+        "is_favorite": False,
+        "favorite_count": await song.get_favorite_count()
+    })
+
+@app.route('/song/<int:id>/favorite_count', methods=['GET'])
+async def get_favorite_count(id):
+    user_id = session['temp_user_id']
+    song = await Song.get(id)
+    if not song:
+        return jsonify({"error": "Song not found"}), 404
+
+    is_favorite = await UserFavorite.exists(user_id=user_id, song_id=id)
+    favorite_count = await song.get_favorite_count()
+
+    return jsonify({
+        "is_favorite": is_favorite,
+        "favorite_count": favorite_count
+    })
 
 # New route to generate song using the agent
 async def generate_song_with_agent(songs):
@@ -191,6 +235,7 @@ def js_escape(value):
     )
 
 app.jinja_env.filters['jsescape'] = js_escape
+app.secret_key = APP_SECRET
 
 if __name__ == '__main__':
     app.run(debug=True, port=8257)

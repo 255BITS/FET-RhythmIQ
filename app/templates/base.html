@@ -26,6 +26,9 @@
     currentSongName: '{{ current_song.name|default('No track playing')|jsescape }}',
     currentSongStyle: '{{ current_song.details.style|default('')|jsescape }}',
     currentSongImage: '{{ current_song.image_large_url|default('/static/images/placeholder.jpg', true)|jsescape }}',
+    isFavorite: {{ 'true' if is_favorite else 'false' }},
+    favoriteCount: {{ current_song.favorite_count }},
+    userId: '{{ user_id }}',
     handleSongEnd() {
         this.advanceSong();
         //htmx.trigger('#queue-container', 'refresh');
@@ -84,6 +87,7 @@
         this.currentSongName = data.name || 'No track playing';
         this.currentSongStyle = data.style || '';
         this.currentSongImage = data.image_large_url || '/static/images/placeholder.jpg';
+        this.updateFavoriteStatus();
     },
     updateSongId() {
         this.isResumed = false; // reset play status on song change
@@ -101,8 +105,37 @@
         const newTime = clickRatio * this.duration;
         this.$refs.audioPlayer.currentTime = newTime;
         this.updateProgress();
-    }
-}"
+    },
+    toggleFavorite() {
+        const endpoint = this.isFavorite ? `/song/${this.currentSongId}/unfavorite` : `/song/${this.currentSongId}/favorite`;
+        fetch(endpoint, { 
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            this.isFavorite = data.is_favorite;
+            this.favoriteCount = data.favorite_count;
+            if (!this.isFavorite) return;
+            this.animateHeart();
+        });
+    },
+    animateHeart() {
+        const heart = document.createElement('div');
+        heart.innerHTML = '❤️';
+        heart.classList.add('floating-heart');
+        document.body.appendChild(heart);
+        setTimeout(() => {
+            heart.remove();
+        }, 1000);
+    },
+    updateFavoriteStatus() {
+        fetch(`/song/${this.currentSongId}/favorite_count`)
+            .then(response => response.json())
+            .then(data => {
+                this.isFavorite = data.is_favorite;
+                this.favoriteCount = data.favorite_count;
+            });
+    },
 }">
    <audio id="audio-player" x-ref="audioPlayer" src="{{ current_song.audio_url }}"
         x-on:timeupdate="updateProgress()" x-on:loadstart="updateSongId()"

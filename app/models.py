@@ -8,7 +8,7 @@ import uuid
 pool = None
 
 class Song:
-    def __init__(self, id, name, created_at, status, details, image_url: Optional[str] = None, image_large_url: Optional[str] = None, video_url: Optional[str] = None, audio_url: Optional[str] = None, generation_uuid = None, listens = None):
+    def __init__(self, id, name, created_at, status, details, image_url: Optional[str] = None, image_large_url: Optional[str] = None, video_url: Optional[str] = None, audio_url: Optional[str] = None, generation_uuid = None, listens = None, favorite_count = 0):
         self.id = id
         self.name = name
         self.created_at = created_at
@@ -24,6 +24,7 @@ class Song:
         self.video_url = video_url
         self.audio_url = audio_url
         self.generation_uuid = generation_uuid
+        self.favorite_count = favorite_count
 
     @classmethod
     async def create(cls, **kwargs):
@@ -171,6 +172,87 @@ class Song:
             )
         self.listens += 1
 
+    async def get_favorite_count(self):
+        return await UserFavorite.get_favorite_count(self.id)
+
+    async def update_favorite_count(self):
+        favorite_count = await self.get_favorite_count()
+        async with pool.acquire() as conn:
+            await conn.execute(
+                "UPDATE songs SET favorite_count = $1 WHERE id = $2",
+                favorite_count, self.id
+            )
+        self.favorite_count = favorite_count
+
+class UserFavorite:
+    def __init__(self, id, user_id, song_id, created_at):
+        self.id = id
+        self.user_id = user_id
+        self.song_id = song_id
+        self.created_at = created_at
+
+    @classmethod
+    async def create(cls, user_id, song_id):
+        async with pool.acquire() as conn:
+            row = await conn.fetchrow(
+                """
+                INSERT INTO user_favorites (user_id, song_id, created_at)
+                VALUES ($1, $2, $3)
+                RETURNING id, user_id, song_id, created_at
+                """,
+                user_id, song_id, datetime.now()
+            )
+        return cls(*row)
+
+    @classmethod
+    async def get(cls, user_id, song_id):
+        async with pool.acquire() as conn:
+            row = await conn.fetchrow(
+                "SELECT * FROM user_favorites WHERE user_id = $1 AND song_id = $2",
+                user_id, song_id
+            )
+        return cls(*row) if row else None
+
+    @classmethod
+    async def delete(cls, user_id, song_id):
+        async with pool.acquire() as conn:
+            await conn.execute(
+                "DELETE FROM user_favorites WHERE user_id = $1 AND song_id = $2",
+                user_id, song_id
+            )
+
+    @classmethod
+    async def get_or_create(cls, user_id, song_id):
+        favorite = await cls.get(user_id, song_id)
+        if favorite is None:
+            favorite = await cls.create(user_id, song_id)
+            return favorite, True
+        return favorite, False
+
+    @classmethod
+    async def exists(cls, user_id, song_id):
+        async with pool.acquire() as conn:
+            result = await conn.fetchval(
+                "SELECT EXISTS(SELECT 1 FROM user_favorites WHERE user_id = $1 AND song_id = $2)",
+                user_id, song_id
+            )
+        return result
+
+    @classmethod
+    async def get_favorite_count(cls, song_id):
+        async with pool.acquire() as conn:
+            count = await conn.fetchval(
+                "SELECT COUNT(*) FROM user_favorites WHERE song_id = $1",
+                song_id
+            )
+        return count
+
+async def get_db_pool(db_url):
+    global pool
+    if pool is None:
+        pool = await asyncpg.create_pool(db_url)
+    return pool
+
 async def init_db(pool_instance):
     global pool
     pool = pool_instance
@@ -190,10 +272,15 @@ async def init_db(pool_instance):
             ALTER TABLE songs ADD COLUMN IF NOT EXISTS generation_uuid UUID;
             ALTER TABLE songs ADD COLUMN IF NOT EXISTS listens INTEGER DEFAULT 0;
             ALTER TABLE songs DROP COLUMN IF EXISTS tags;
+            ALTER TABLE songs ADD COLUMN IF NOT EXISTS favorite_count INTEGER DEFAULT 0;
+
+            CREATE TABLE IF NOT EXISTS user_favorites (
+                id SERIAL PRIMARY KEY,
+                user_id TEXT NOT NULL,
+                song_id INTEGER NOT NULL,
+                created_at TIMESTAMP NOT NULL,
+                UNIQUE(user_id, song_id)
+            );
         """)
 
-async def get_db_pool(db_url):
-    global pool
-    if pool is None:
-        pool = await asyncpg.create_pool(db_url)
-    return pool
+

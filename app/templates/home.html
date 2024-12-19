@@ -20,6 +20,12 @@
     </div>
     
     <div class="controls">
+        <button class="control-btn heart-btn"
+                x-on:click="toggleFavorite()"
+                x-bind:class="{ 'active': isFavorite }">
+            <span class="heart-icon" x-text="isFavorite ? '❤️' : '🤍'"></span>
+        </button>
+        <span class="favorite-count" x-text="favoriteCount"></span>
         <button class="control-btn play-btn" 
                 x-on:click="
                     isPlaying = !isPlaying;
