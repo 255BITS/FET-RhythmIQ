@@ -124,7 +124,10 @@ async def get_favorite_count(id):
     is_favorite = await UserFavorite.exists(user_id=user_id, song_id=id)
     favorite_count = await song.get_favorite_count()
 
-    return str(favorite_count)
+    return jsonify({
+        "is_favorite": is_favorite,
+        "favorite_count": (favorite_count or 0)
+    })
 
 # New route to generate song using the agent
 async def generate_song_with_agent(songs):

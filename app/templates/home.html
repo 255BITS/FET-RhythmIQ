@@ -21,16 +21,27 @@
             </button>
             <span class="favorite-count" 
                   x-text="favoriteCount"
-                  x-ref="favoriteCount"
+                  ></span>
+              <span class='hidden'
                   :hx-get="`/song/${currentSongId}/favorite_count`"
                   hx-trigger="every 5s"
                   hx-swap="innerHTML"
-                  x-init="$el.addEventListener('htmx:afterOnLoad', (event) => {
-                      if (event.detail.target === $el) {
-                          checkAndAnimateHearts(event.detail.xhr.response);
-                      }
-                  })"
-                        ></span>
+                  x-init="
+                    // Add a native event listener for htmx:configRequest
+                    $nextTick(() => {
+                      $el.addEventListener('htmx:configRequest', event => {
+                        event.detail.path = `/song/${currentSongId}/favorite_count`;
+                      });
+
+                      // Also for afterOnLoad
+                      $el.addEventListener('htmx:afterOnLoad', (event) => {
+                        if (event.detail.target === $el) {
+                          checkAndAnimateHearts(JSON.parse(event.detail.xhr.response));
+                        }
+                      });
+                      })">
+            </span>
+
         </div>
     </div>
     

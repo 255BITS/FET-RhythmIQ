@@ -125,8 +125,8 @@
             this.animateHeart();
         });
     },
-    checkAndAnimateHearts(newCount) {
-        newCount = parseInt(newCount);
+    checkAndAnimateHearts(data) {
+        newCount = parseInt(data.favorite_count);
         const diff = newCount - this.lastFavoriteCount;
         if (diff > 0) {
             this.animateMultipleHearts(diff);
@@ -151,11 +151,11 @@
         const heart = document.createElement('div');
         heart.innerHTML = '❤️';
         heart.classList.add('floating-heart');
-        
+
         // Position the heart
-        heart.style.left = `${rect.left + rect.width / 2}px`;
-        heart.style.top = `${rect.top + rect.height / 2}px`;
-        
+        heart.style.left = `${rect.left + rect.width / 2 + window.scrollX}px`;
+        heart.style.top = `${rect.top + rect.height / 2 + window.scrollY}px`;
+
         // Add randomness
         const randomScale = 0.9 + Math.random() * 0.2;
         const randomDuration = 1.2 + Math.random() * 0.3;
