@@ -53,6 +53,11 @@ body {
 /* Now Playing */
 .now-playing {
   margin-bottom: 1.5rem;
+  position: relative;
+  padding-right: 40px; /* Make space for the heart button */
+  background-color: rgba(45, 47, 62, 0.5);
+  border-radius: 0.75rem;
+
 }
 
 .current-track-container {
@@ -60,8 +65,12 @@ body {
   align-items: center;
   gap: 1rem;
   padding: 1rem;
-  background-color: rgba(45, 47, 62, 0.5);
-  border-radius: 0.75rem;
+}
+
+
+.current-track-container {
+    display: flex;
+    align-items: center;
 }
 
 .cover-image {
@@ -328,20 +337,57 @@ body {
   border-radius: 2px;
 }
 
-.floating-heart {
-    position: fixed;
+.heart-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
     font-size: 24px;
-    animation: float-heart 1s ease-out;
-    pointer-events: none;
+    padding: 0;
+    margin: 0;
+}
+
+.favorite-count {
+    font-size: 14px;
+}
+
+/* Remove any existing .control-btn styles that might affect the heart button */
+.heart-btn.control-btn {
+    all: unset;
+    cursor: pointer;
 }
 
 @keyframes float-heart {
     0% {
-        transform: translateY(0) translateX(-50%);
+        transform: translate(-50%, -50%) rotate(0deg);
         opacity: 1;
     }
+    25% {
+        transform: translate(calc(-50% - 10px), -160%) rotate(-5deg);
+    }
+    50% {
+        transform: translate(-50%, -270%) rotate(0deg);
+    }
+    75% {
+        transform: translate(calc(-50% + 10px), -380%) rotate(5deg);
+    }
     100% {
-        transform: translateY(-100px) translateX(-50%) rotate(20deg);
+        transform: translate(-50%, -200px) rotate(0deg);
         opacity: 0;
     }
+}
+
+.floating-heart {
+    position: fixed;
+    font-size: 24px;
+    animation: float-heart 1.5s ease-in-out forwards;
+    pointer-events: none;
+}
+
+.song-actions {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }

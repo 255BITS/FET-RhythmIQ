@@ -28,6 +28,7 @@
     currentSongImage: '{{ current_song.image_large_url|default('/static/images/placeholder.jpg', true)|jsescape }}',
     isFavorite: {{ 'true' if is_favorite else 'false' }},
     favoriteCount: {{ current_song.favorite_count }},
+    lastFavoriteCount: {{ current_song.favorite_count }},
     userId: '{{ user_id }}',
     handleSongEnd() {
         this.advanceSong();
@@ -119,14 +120,52 @@
             this.animateHeart();
         });
     },
+    checkAndAnimateHearts(newCount) {
+        newCount = parseInt(newCount);
+        const diff = newCount - this.lastFavoriteCount;
+        if (diff > 0) {
+            this.animateMultipleHearts(diff);
+        }
+        this.favoriteCount = newCount;
+        this.lastFavoriteCount = newCount;
+    },
+    animateMultipleHearts(count) {
+        let heartsToAnimate;
+        if (count === 1) heartsToAnimate = 1;
+        else if (count <= 3) heartsToAnimate = count;
+        else if (count <= 10) heartsToAnimate = 4 + Math.floor(Math.random() * 3);
+        else heartsToAnimate = Math.ceil(Math.log(count)) + Math.floor(Math.random() * 3);
+
+        for (let i = 0; i < heartsToAnimate; i++) {
+            setTimeout(() => this.animateHeart(), i * 200);
+        }
+    },
     animateHeart() {
+        const heartBtn = document.querySelector('.heart-btn');
+        const rect = heartBtn.getBoundingClientRect();
         const heart = document.createElement('div');
         heart.innerHTML = '❤️';
         heart.classList.add('floating-heart');
+        
+        // Position the heart
+        heart.style.left = `${rect.left + rect.width / 2}px`;
+        heart.style.top = `${rect.top + rect.height / 2}px`;
+        
+        // Add some randomness
+        const randomScale = 0.9 + Math.random() * 0.2;
+        const randomDuration = 0.75 + Math.random() * 0.2;
+        const randomDelay = Math.random() * 0.1;
+
+        heart.style.transform = `translate(-50%, -50%)`;
+        heart.style.animationDuration = `${randomDuration}s`;
+        heart.style.animationDelay = `${randomDelay}s`;
+
         document.body.appendChild(heart);
+
+        // Remove the heart from the DOM after the animation
         setTimeout(() => {
             heart.remove();
-        }, 1000);
+        }, (randomDuration + randomDelay) * 1000);
     },
     updateFavoriteStatus() {
         fetch(`/song/${this.currentSongId}/favorite_count`)

@@ -12,7 +12,26 @@
                 <span class="song-title" x-text="currentSongName"></span>
                 <span class="style-tag-full" x-text="currentSongStyle"></span>
             </div>
-       </div>
+        </div>
+        <div class="song-actions">
+            <button class="heart-btn"
+                    x-on:click="toggleFavorite()"
+                    x-bind:class="{ 'active': isFavorite }">
+                <span class="heart-icon" x-text="isFavorite ? '❤️' : '🤍'"></span>
+            </button>
+            <span class="favorite-count" 
+                  x-text="favoriteCount"
+                  x-ref="favoriteCount"
+                  :hx-get="`/song/${currentSongId}/favorite_count`"
+                  hx-trigger="every 5s"
+                  hx-swap="innerHTML"
+                  x-init="$el.addEventListener('htmx:afterOnLoad', (event) => {
+                      if (event.detail.target === $el) {
+                          checkAndAnimateHearts(event.detail.xhr.response);
+                      }
+                  })"
+                        ></span>
+        </div>
     </div>
     
     <div class="progress-bar" id="song-progress" x-on:click="seekSong($event)">
@@ -20,12 +39,6 @@
     </div>
     
     <div class="controls">
-        <button class="control-btn heart-btn"
-                x-on:click="toggleFavorite()"
-                x-bind:class="{ 'active': isFavorite }">
-            <span class="heart-icon" x-text="isFavorite ? '❤️' : '🤍'"></span>
-        </button>
-        <span class="favorite-count" x-text="favoriteCount"></span>
         <button class="control-btn play-btn" 
                 x-on:click="
                     isPlaying = !isPlaying;
