@@ -105,7 +105,7 @@ def generate_audio(title, lyrics, style, negative_style):
         'generation_type': 'TEXT',
         'prompt': lyrics,
         'negative_tags': negative_style,
-        'mv': 'chirp-v3-5'
+        'mv': 'chirp-v4'
     }
     response = requests.post('https://api.sunoaiapi.com/api/v1/gateway/generate/music', json=data, headers=headers)
     print("response", response.status_code, response.text)
