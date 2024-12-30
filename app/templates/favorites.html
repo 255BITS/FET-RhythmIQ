@@ -2,41 +2,126 @@
 
 {% block content %}
 <div class="player-content">
-    <div class="favorites-section">
-        <h2 class="queue-title">Favorites</h2>
-        <div class="queue-items">
-            {% for song in favorites %}
-            <div class="queue-item">
-                <img src="{{ song.image_url|default('/static/images/placeholder.jpg', true) }}"
-                     alt="Album Cover"
-                     class="queue-cover-image">
-                <div class="song-details">
-                  <span class="song-name">{{ song.name }} (+{{song.favorite_count}})</span>
-                    <div class="song-info">
-                        <span class="style-tag">{{ song.details.style }}</span>
-                        <span class="status-tag">{{ song.status }}</span>
-                    </div>
-                </div>
-                <div class="flex gap-2 items-center">
-                    <!-- Play button can be adapted to your existing JS or Alpine logic -->
-                    <button class="control-btn"
-                            x-on:click="
-                                currentSongId = {{ song.id }};
-                                $refs.audioPlayer.src = '{{ song.audio_url }}';
-                                $refs.audioPlayer.play();
-                                isPlaying = true;
-                            ">
-                        ▶
-                    </button>
-                    <!-- Download button -->
-                    <a href="{{ song.audio_url }}" download class="control-btn"
-                       title="Download {{ song.name }}">
-                        ⬇
-                    </a>
-                </div>
+    <!-- Now Playing section -->
+    <div class="now-playing">
+        <div class="current-track-container">
+            <img :src="currentSongImage"
+                 alt="Album Cover" 
+                 class="cover-image">
+            <div class="track-info">
+                <span class="label">Now Playing:</span>
+                <span class="song-title" x-text="currentSongName"></span>
+                <span class="style-tag-full" x-text="currentSongStyle"></span>
             </div>
-            {% endfor %}
         </div>
+        <div class="song-actions">
+            <button class="heart-btn"
+                    x-on:click="toggleFavorite()"
+                    x-bind:class="{ 'active': isFavorite }">
+                <span class="heart-icon" x-text="isFavorite ? '❤️' : '🤍'"></span>
+            </button>
+            <span class="favorite-count" x-text="favoriteCount"></span>
+            <span class='hidden'
+                  :hx-get="`/song/${currentSongId}/favorite_count`"
+                  hx-trigger="every 5s"
+                  hx-swap="innerHTML"
+                  x-init="
+                    $nextTick(() => {
+                      $el.addEventListener('htmx:configRequest', event => {
+                        event.detail.path = `/song/${currentSongId}/favorite_count`;
+                      });
+                      $el.addEventListener('htmx:afterOnLoad', (event) => {
+                        if (event.detail.target === $el) {
+                          checkAndAnimateHearts(JSON.parse(event.detail.xhr.response));
+                        }
+                      });
+                    })">
+            </span>
+        </div>
+    </div>
+
+    <!-- Progress bar & playback controls -->
+    <div class="progress-bar" id="song-progress" x-on:click="seekSong($event)">
+        <div class="progress-fill" x-bind:style="{ width: progress + '%' }"></div>
+    </div>
+
+    <div class="controls">
+        <button class="control-btn play-btn" 
+                x-on:click="
+                    isPlaying = !isPlaying;
+                    if (isPlaying) {
+                        $refs.audioPlayer.play();
+                    } else {
+                        $refs.audioPlayer.pause();
+                        isResumed = false;
+                    }
+                    if (isPlaying && !isResumed) {
+                        fetch(`/song/${currentSongId}/listen`, { method: 'POST' });
+                        isResumed = true;
+                    }
+                "
+                x-bind:class="{ 'active': isPlaying }"
+                hx-swap="none">
+            <span class="play-icon" x-text="isPlaying ? '⏸' : '▶'"></span>
+        </button>
+        <button class="control-btn skip-btn" 
+                x-on:click="skipSong()">
+            <span class="skip-icon">⏭</span>
+        </button>
+    </div>
+
+    <!-- Favorites Queue -->
+    <div class="favorites-section">
+      <h2 class="queue-title">Favorites</h2>
+      <div class="queue-items">
+        {% for song in favorites %}
+          <div class="queue-item"
+               x-on:click="
+                 currentSongId = {{ song.id }};
+                 $refs.audioPlayer.src = '{{ song.audio_url }}';
+                 $refs.audioPlayer.play();
+                 isPlaying = true;
+               ">
+            <img src="{{ song.image_url|default('/static/images/placeholder.jpg', true) }}"
+                 alt="Album Cover"
+                 class="queue-cover-image">
+            <div class="song-details">
+              <span class="song-name">{{ song.name }} (+{{song.favorite_count}})</span>
+              <div class="song-info">
+                  <span class="style-tag">{{ song.details.style }}</span>
+                  <span class="status-tag">{{ song.status }}</span>
+              </div>
+            </div>
+            <div class="flex gap-2 items-center">
+              <!-- Play button -->
+              <button class="control-btn"
+                        x-on:click="
+                          currentSongId = {{ song.id }};
+                          $refs.audioPlayer.src = '{{ song.audio_url|jsescape }}';
+                          updateSongInfo({
+                            id: {{ song.id }},
+                            name: '{{ song.name|default('Untitled')|jsescape }}',
+                            style: '{{ song.details.style|default('')|jsescape }}',
+                            image_large_url: '{{ song.image_large_url|default('/static/images/placeholder.jpg', true)|jsescape }}'
+                          });
+                          isPlaying = true;
+                          $nextTick(() => {
+                            $refs.audioPlayer.play();
+                            fetch(`/song/${song.id}/listen`, { method: 'POST' });
+                            isResumed = true;
+                          });
+                        ">
+                  ▶
+              </button>
+              <!-- Download button -->
+              <a href="{{ song.audio_url }}" download class="control-btn"
+                 title="Download {{ song.name }}">
+                  ⬇
+              </a>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
     </div>
 </div>
 {% endblock %}
