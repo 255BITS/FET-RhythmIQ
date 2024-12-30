@@ -75,13 +75,19 @@
       <h2 class="queue-title">Favorites</h2>
       <div class="queue-items">
         {% for song in favorites %}
-          <div class="queue-item"
-               x-on:click="
-                 currentSongId = {{ song.id }};
-                 $refs.audioPlayer.src = '{{ song.audio_url }}';
-                 $refs.audioPlayer.play();
-                 isPlaying = true;
-               ">
+          <div 
+            class="queue-item"
+            data-song-id="{{ song.id }}"
+            data-audio-url="{{ song.audio_url|jsescape }}"
+            data-name="{{ song.name|default('Untitled')|jsescape }}"
+            data-style="{{ song.details.style|default('')|jsescape }}"
+            data-image-url="{{ song.image_large_url|default('/static/images/placeholder.jpg', true)|jsescape }}"
+            x-on:click="
+              currentSongId = {{ song.id }};
+              $refs.audioPlayer.src = '{{ song.audio_url|jsescape }}';
+              $refs.audioPlayer.play();
+              isPlaying = true;
+            ">
             <img src="{{ song.image_url|default('/static/images/placeholder.jpg', true) }}"
                  alt="Album Cover"
                  class="queue-cover-image">
