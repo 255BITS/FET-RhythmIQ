@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="player-content">
+    <div class="favorites-section">
+        <h2 class="queue-title">Favorites</h2>
+        <div class="queue-items">
+            {% for song in favorites %}
+            <div class="queue-item">
+                <img src="{{ song.image_url|default('/static/images/placeholder.jpg', true) }}"
+                     alt="Album Cover"
+                     class="queue-cover-image">
+                <div class="song-details">
+                  <span class="song-name">{{ song.name }} (+{{song.favorite_count}})</span>
+                    <div class="song-info">
+                        <span class="style-tag">{{ song.details.style }}</span>
+                        <span class="status-tag">{{ song.status }}</span>
+                    </div>
+                </div>
+                <div class="flex gap-2 items-center">
+                    <!-- Play button can be adapted to your existing JS or Alpine logic -->
+                    <button class="control-btn"
+                            x-on:click="
+                                currentSongId = {{ song.id }};
+                                $refs.audioPlayer.src = '{{ song.audio_url }}';
+                                $refs.audioPlayer.play();
+                                isPlaying = true;
+                            ">
+                        ▶
+                    </button>
+                    <!-- Download button -->
+                    <a href="{{ song.audio_url }}" download class="control-btn"
+                       title="Download {{ song.name }}">
+                        ⬇
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

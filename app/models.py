@@ -27,6 +27,22 @@ class Song:
         self.favorite_count = favorite_count
 
     @classmethod
+    async def get_all_favorites(cls):
+        """
+        Fetch all songs that have been marked as favorites by any user.
+        """
+        async with pool.acquire() as conn:
+            rows = await conn.fetch(
+                """
+                SELECT s.*
+                FROM songs s
+                WHERE favorite_count > 0
+                ORDER BY favorite_count DESC, created_at DESC
+                """
+            )
+        return [cls(*row) for row in rows]
+    
+    @classmethod
     async def create(cls, **kwargs):
         # Set default values for optional fields
         name = kwargs.get("name", "Unknown Title")

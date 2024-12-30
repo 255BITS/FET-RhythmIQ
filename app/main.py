@@ -38,6 +38,14 @@ async def home():
     is_favorite = await UserFavorite.exists(user_id=user_id, song_id=current_song.id)
     return await render_template('home.html', current_song=current_song, is_favorite=is_favorite)
 
+@app.route('/favorites')
+async def favorites():
+    """
+    List all songs favorited by users.
+    """
+    favorites = await Song.get_all_favorites()
+    return await render_template('favorites.html', favorites=favorites, current_song=favorites[0])
+
 @app.route('/create_song')
 async def create_song():
     return await render_template('create_song.html')
