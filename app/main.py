@@ -34,7 +34,7 @@ async def before_request():
 @app.route('/')
 async def home():
     user_id = session['temp_user_id']
-    current_song = await Song.last_complete(3)
+    current_song = await Song.last_complete(6)
     is_favorite = await UserFavorite.exists(user_id=user_id, song_id=current_song.id)
     return await render_template('home.html', current_song=current_song, is_favorite=is_favorite)
 
