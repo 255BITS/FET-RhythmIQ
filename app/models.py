@@ -88,7 +88,7 @@ class Song:
                     WHERE created_at >= $1::timestamp
                     AND (
                         status = 'complete'
-                        OR (created_at >= NOW() - INTERVAL '5 minutes' AND status != 'complete')
+                        OR (created_at >= NOW() - INTERVAL '10 minutes' AND status != 'complete')
                     )
                     AND generation_uuid != $2
                     ORDER BY generation_uuid, created_at DESC
