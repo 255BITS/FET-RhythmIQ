@@ -63,6 +63,14 @@ async def update_queue():
     current_song_id = request.args.get("currentSongId")
     current_song = await Song.get(current_song_id)
     songs = await Song.get_songs_after(current_song)
+    if len(songs) < 3:
+        # Prevent duplicate generation if already processing
+        existing_generations = any((s.status != 'complete' and s.status != 'error') for s in songs)
+        if not existing_generations:
+            generation_uuid = str(uuid.uuid4())
+            song1 = await Song.create(name="New Song 1", status="generating", generation_uuid=generation_uuid)
+            song2 = await Song.create(name="New Song 2", status="generating", generation_uuid=generation_uuid)
+            asyncio.create_task(generate_song_with_agent([song1, song2]))
     return await render_template('partials/queue.html', songs=songs, song=current_song)
 
 @app.route('/stream_music')
@@ -81,19 +89,6 @@ async def listen(id):
     song = await Song.get(id)
     if song:
         await song.increment_listen_count()
-        songs_after = await Song.get_songs_after(song)
-        print("Listen!", len(songs_after))
-        if len(songs_after) < 3:
-            # Prevent duplicate generation if already processing
-            existing_generations = any(s.status == 'generating' for s in await Song.get_all())
-            if existing_generations:
-                return jsonify({"status": "success"})
-
-            generation_uuid = str(uuid.uuid4())
-            song1 = await Song.create(name="New Song 1", status="generating", generation_uuid=generation_uuid)
-            song2 = await Song.create(name="New Song 2", status="generating", generation_uuid=generation_uuid)
-            asyncio.create_task(generate_song_with_agent([song1, song2]))
- 
         return jsonify({"status": "success"})
     return jsonify({"status": "error", "message": "Song not found"}), 404
 
@@ -159,7 +154,7 @@ async def generate_song_with_agent(songs):
             for song in songs:
                 await song.update_status("writing lyrics")
 
-            response_write_song = await client.post(f"{AGENT_HOST}/write_song", json={"instruction":""}, timeout=600)
+            response_write_song = await client.post(f"{AGENT_HOST}/write_song", json={"instruction":""}, timeout=1000)
 
             if response_write_song.status_code == 200:
                 lyrics_result = response_write_song.json()
@@ -177,7 +172,7 @@ async def generate_song_with_agent(songs):
                 await song.update_name(lyrics_result["title"])
             # Step 2: Pass lyrics to /sing to generate media URLs for two songs
             logging.debug("Calling /sing endpoint with generated lyrics.")
-            response_sing = await client.post(f"{AGENT_HOST}/sing", json=lyrics_result, timeout=600)
+            response_sing = await client.post(f"{AGENT_HOST}/sing", json=lyrics_result, timeout=1000)
 
             if response_sing.status_code == 200:
                 sing_results = response_sing.json()
