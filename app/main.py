@@ -84,6 +84,11 @@ async def listen(id):
         songs_after = await Song.get_songs_after(song)
         print("Listen!", len(songs_after))
         if len(songs_after) < 3:
+            # Prevent duplicate generation if already processing
+            existing_generations = any(s.status == 'generating' for s in await Song.get_all())
+            if existing_generations:
+                return jsonify({"status": "success"})
+
             generation_uuid = str(uuid.uuid4())
             song1 = await Song.create(name="New Song 1", status="generating", generation_uuid=generation_uuid)
             song2 = await Song.create(name="New Song 2", status="generating", generation_uuid=generation_uuid)
