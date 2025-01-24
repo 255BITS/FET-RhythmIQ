@@ -34,7 +34,7 @@ async def before_request():
 @app.route('/')
 async def home():
     user_id = session['temp_user_id']
-    current_song = await Song.last_complete(6)
+    current_song = await Song.last_complete(5)
     is_favorite = await UserFavorite.exists(user_id=user_id, song_id=current_song.id)
     return await render_template('home.html', current_song=current_song, is_favorite=is_favorite)
 
@@ -50,28 +50,20 @@ async def favorites():
 async def create_song():
     return await render_template('create_song.html')
 
-@app.route('/generate_song', methods=['POST'])
-async def generate_song():
-    generation_uuid = str(uuid.uuid4())
-    song1 = await Song.create(name="New Song 1", status="generating", generation_uuid=generation_uuid)
-    song2 = await Song.create(name="New Song 2", status="generating", generation_uuid=generation_uuid)
-    asyncio.create_task(generate_song_with_agent([song1, song2]))
-    return jsonify([{"id": song1.id, "name": song1.name, "status": song1.status}, {"id": song2.id, "name": song2.name, "status": song2.status}])
-
 @app.route('/queue')
 async def update_queue():
     current_song_id = request.args.get("currentSongId")
     current_song = await Song.get(current_song_id)
-    songs = await Song.get_songs_after(current_song)
-    if len(songs) < 6:
+    songs = await Song.get_songs_after(current_song, limit=10)
+    generating_songs = [s for s in songs if s.status not in ('complete', 'error')]
+
+    if len(songs) < 6 and len(generating_songs) == 0:
         # Prevent duplicate generation if already processing
-        existing_generations = any((s.status != 'complete' and s.status != 'error') for s in songs)
-        if not existing_generations:
-            generation_uuid = str(uuid.uuid4())
-            song1 = await Song.create(name="New Song 1", status="generating", generation_uuid=generation_uuid)
-            song2 = await Song.create(name="New Song 2", status="generating", generation_uuid=generation_uuid)
-            asyncio.create_task(generate_song_with_agent([song1, song2]))
-    return await render_template('partials/queue.html', songs=songs, song=current_song)
+        generation_uuid = str(uuid.uuid4())
+        song1 = await Song.create(name="New Song 1", status="generating", generation_uuid=generation_uuid)
+        song2 = await Song.create(name="New Song 2", status="generating", generation_uuid=generation_uuid)
+        asyncio.create_task(generate_song_with_agent([song1, song2]))
+    return await render_template('partials/queue.html', songs=songs, song=current_song, number_generating = len(generating_songs))
 
 @app.route('/stream_music')
 async def stream_music():
