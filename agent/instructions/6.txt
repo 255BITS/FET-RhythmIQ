@@ -1,0 +1,5 @@
+Compose a villanelle about artificial intelligence developing emotions. Maintain strict 19-line structure with repeating refrains.
+
+Song:
+Uses: [Baroque pop], [Harpsichord], [Pitch-shifted vocals]
+Note: Refrains should degrade/grow more human each repetition

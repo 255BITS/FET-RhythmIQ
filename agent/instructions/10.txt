@@ -1,0 +1,13 @@
+Compose a multilingual round where each verse cycles through different languages. Melody must adapt phonetics to each tongue while maintaining harmonic continuity.
+
+Song:
+Uses: [Polyrhythmic percussion], [Linguistic morphing synths], [Binaural panning]
+Structure: Verse 1 (Mandarin) → Verse 2 (Swahili) → Verse 3 (Nahuatl) → Unified chorus (All three)
+Constraints: 
+- Each verse must use authentic idiomatic expressions
+- Transition between languages should feel phonetically inevitable
+- Final chorus combines all three languages grammatically
+
+Example approach:
+"Moonlight" becomes "Yuèguāng" (月光) → "Mwangaza wa mwezi" → "Metztli"
+
