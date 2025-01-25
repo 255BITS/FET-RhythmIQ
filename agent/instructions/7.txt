@@ -1,6 +1,0 @@
-Create a song where every line is a palindrome. Melody must mirror this structure - ascending then descending.
-
-Song:  
-Uses: [Retro wave], [Symmetric drum patterns], [Mirrored stereo panning]
-Examples: 
-"A man, a plan, a canal: Panama" becomes chorus hook
