@@ -1,0 +1,8 @@
+Compose a time travel love song where each verse uses different musical time periods. Structure must include palindrome canons and retrograde inversions.
+
+Song:
+Uses: [Tape echo loops], [Harpsichord glitches], [808 time machine beats]
+Structure: Verse 1 (Baroque) -> Chorus (Future) -> Verse 2 (Reverse Baroque) -> Chorus (Past)
+Constraint: 
+- Chorus lyrics must be palindromic
+- Bridge uses Fibonacci sequence in syllable counts

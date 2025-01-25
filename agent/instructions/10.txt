@@ -1,0 +1,12 @@
+Create a song using plant biology metaphors where the structure mirrors photosynthesis. Verses represent light-dependent reactions and chorus embodies Calvin cycle.
+
+Song:
+Uses: [Chlorophyll synth pads], [Stomatal click rhythms], [Circadian beat]
+Structure: 
+- Verse 1 (Dawn) -> Pre-Chorus (Photon burst) 
+- Chorus (Carbon fixation) -> Verse 2 (Noon) 
+- Breakdown (Photorespiration) -> Chorus (Night adaptation)
+Constraints:
+- Syllable counts in verses must follow Fibonacci sequence
+- Chorus lyrics must include actual chloroplast protein names
+- Bridge uses palindromic lyrics mirroring DNA replication

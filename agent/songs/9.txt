@@ -1,0 +1,36 @@
+Avoid words: clock, paradox, machine
+Uses: [Magnetic tape percussion], [Fugue counterpoint], [Pitch-bent arpeggiators]
+Starts: Wax cylinder hiss
+Note: Bassline follows Gregorian chant modes played backwards
+
+Lyrics:
+Verse 1 (1710):  
+Quill scratches parchment concert A  
+Harpsichord springs keep courtly time  
+Your minuet traces my heart's crime  
+In parallel fifths we disobey  
+
+Chorus (3030):  
+Δt = 0 → Meet me where tenses collide  
+You're my phase shift, my causal tide  
+Tide causal my, shift phase my You're  
+Collide tenses where me Meet ← 0 = tΔ  
+
+Verse 2 (1710⁻¹):  
+Disobey we fifths parallel In  
+Crime heart's my traces minuet Your  
+Time courtly keep springs Harpsichord  
+A concert parchment scratches Quill  
+
+Bridge (1440):  
+Press (Gutenberg) our lips to type  
+Each (moveable) kiss in leaden night  
+Matrix (rhymes) with inky flesh  
+Tomorrow's Bible: Our score enmeshed  
+
+[Fibonacci breakdown: Syllables per line 1,1,2,3,5,8]
+
+Style:
+Chronocore - Baroque fugue meets glitch hop (3/4 vs 4/4 polyrhythms)
+
+Negative Style:

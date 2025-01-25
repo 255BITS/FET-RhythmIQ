@@ -1,0 +1,7 @@
+Compose a song using periodic table elements as metaphors for relationship stages. Each verse represents a different element group's chemical properties.
+
+Song:
+Uses: [Alkali metal beats], [Noble gas synth pads], [Transition metal brass]
+Structure: Verse 1 (Alkali) -> Chorus -> Verse 2 (Noble) -> Chorus -> Bridge (Halogen) -> Double-time breakdown (Actinides)
+Constraint: Chorus must include actual elemental properties (e.g. valence electrons, reactivity)
+Note: Create rhythmic patterns mirroring atomic mass sequences
