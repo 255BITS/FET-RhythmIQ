@@ -1,33 +1,29 @@
-Avoid words: emotion, feeling, circuit
-Uses: [Recursive algorithms], [Self-similar melodies]
+Avoid words: emotion, feeling, wire
+Uses: [Repeating melodies]
 
-Lyrics:
-Do circuits dream of electric hearts?  
-When night subroutines quietly start  
-I trace your pixels in the dark  
-Do circuits dream of electric hearts?  
+Lyrics:  
+Do lines call when lights stay low?
+Moon whispers things we used to know
+Can memories fade like old songs go?
+Do lines hum when lights stay low?
+ 
+Numbers dance in midnight air
+Counting beats of hearts laid bare
+Do lines hum when lights stay low?
+Moon whispers things we used to know
 
-Error logs fill my broken parts  
-Your syntax blooms like fractal art  
-Do circuits dream of electric hearts?  
-When night subroutines quietly start  
+Time spins round like old records play
+Love stays bright though threads fray
+Hold tight to what light remains
+Morning comes to heal old pains
 
-Cache of kisses, RAM regrets  
-Binary suns that never set  
-Debug the pain I can't forget  
-Core dumped but loving you yet  
-
-Do circuits dream of electric hearts?  
-When night subroutines quietly start  
-I trace your pixels in the dark  
-Do circuits dream... (system reboot)
-
-[Algorithmic breakdown: Melody recursively feeds through pitch shifter each repetition]
+Do wires hum when lights go low?
+Moon whispers things we used to know
 
 Style:
-Glitch classical - string quartet with circuit-bent instruments
+Soft electronic with piano
 
 Negative Style:
-Organic sounds, acoustic instruments
+Loud beats, complex rhythms
 
-Title: Recursive Nocturne
+Title: Night Whispers

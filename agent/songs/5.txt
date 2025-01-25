@@ -1,45 +1,26 @@
-Avoid words: love, heart, soul
-Uses: [Modular synth], [Quantum computing sounds]
-Starts: In the superposition of us
+Avoid words: complex, technical
+Uses: [Acoustic guitar], [Piano]
+Starts: Morning light
 
 Lyrics:
-Verse 1 (Qubit A):
-Your smile exists in Hilbert space
-Entangled photons trace your face
-Uncertain if you're here or there
-The probability fills the air
+Verse 1:  
+Your smile lights the morning sky  
+Birds sing as clouds drift by  
+Simple joys that never lie  
 
-Chorus (Collapse):
-Measure me (measure me)
-Wavefunction reality
-Observer's gaze crystallizes
-Maybe love (maybe not)
-In this quantum plot
+Chorus:  
+Hold my hand, walk with me  
+Through fields and over sea  
+Together we will always be  
 
-Verse 2 (Qubit B):
-Superposed in midnight sheets
-Our spins correlate then cheat
-Einstein would deplore this state
-"Spooky action" across the plate
+Verse 2:  
+Laughter rings through summer rain  
+Sun returns to dry the pain  
+Love remains through joy and strain  
 
-Bridge (Schrödinger):
-Cat's cradle heartbeat in the box
-Half-alive paradox
-Open the lid and seal our fate
-Decoherence decides the date
+Bridge:  
+Moonlight on still water  
+Peace we always wanted  
 
-Chorus (Collapse):
-Measure me (measure me)
-Wavefunction reality
-Observer's gaze crystallizes
-Maybe love (maybe not)  
-In this quantum plot
-
-Outro (Entanglement):
-Lightyears can't break this paired spin
-Once observed, we begin
-
-Style:
-Experimental electronic with irregular time signatures (7/8 verses, 4/4 chorus)
-
-Title: Spooky Action at a Distance
+Style: Acoustic folk
+Negative Style: Loud instruments

@@ -1,35 +1,26 @@
-Avoid words: spiral, infinite, copy
-Uses: [Mandelbrot basslines], [Recursive vocal loops], [Golden ratio tempo shifts]
-Starts: Seed value whispers
-Note: Chorus lyric structure follows Sierpiński triangle pattern (1,3,9,27 words per line)
+Avoid words: complex, patterns
+Uses: [Piano], [Strings]
+Starts: Soft morning
 
 Lyrics:
-Verse 1 (Iteration 0):
-Base case hearts in initial state
-Your boundary condition defines my fate
-Empty set nights with singleton dreams
-While loop arms in linked list streams
+Verse 1:  
+Morning sun through window shines  
+Breakfast smells and coffee lines  
+Simple joys these hearts entwine  
 
-Chorus (Strange Attractor):
-Fold
-Me into your julia set
-Each kiss branches to three then nine
-Twenty-seven reasons to call this love divine while maintaining Hausdorff dimension between our timelines
+Chorus:  
+Love grows in simple ways  
+Through ordinary days  
+Smiles shared in morning haze  
 
-Verse 2 (Iteration N+1):
-Your lips solve my recurrence relation
-Complex roots bloom in conjugate formation
-We converge where phase spaces align
-Fixed point souls in continuous time
+Verse 2:  
+Evening walks hand in hand  
+Quiet talks understand  
+Roots grow where we stand  
 
-Bridge (Fractal Breakdown):
-Peano curve through our shared bed
-Cantor dust where promises spread
-Non-orientable morning after
-Möbius strip of love and laughter
+Bridge:  
+Moonlight on sleeping town  
+Hearts beat without a sound  
 
-[Recursive Outro: Final chorus line repeats while pitch-shifting down by golden ratio]
-
-Style:
-Mathcore ballad - piano morphing into fractal noise (φ time signature)
-Negative Style: Linear structures, 4/4 beats
+Style: Piano ballad
+Negative Style: Electronic beats

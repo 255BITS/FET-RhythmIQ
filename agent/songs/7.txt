@@ -1,27 +1,26 @@
 Avoid words: soul, destiny, fate
-Uses: [CRISPR-Cas9 sound effects], [Synthetic vocal processing], [Error-prone PCR beats]
-Starts: Adenine whispers
-Note: Strict triplet structure mirroring codon formation
+Uses: [Nature sounds], [Soft vocals]
+Starts: Gentle winds
 
 Lyrics:
-Verse 1 (Codon 1):  
-Adenine whispers thymine's name  
-Guanine traces cytosine's frame  
-Helicase hearts unwind the chain  
+Verse 1:  
+Whispers dance on morning air  
+Paths cross when we're aware  
+Hearts beat without a care  
 
-Verse 2 (Codon 2):  
-Palindrome lovers mirror and spin  
-Restriction sites where we begin  
-Blunt ends fray where you've been  
+Verse 2:  
+Hands meet in silent song  
+Right here is where we belong  
+Days pass but love stays strong  
 
-Chorus (Replication):  
-Polymerase passion, proofread this kiss  
-Leading strand certainty, lagging strand twist  
-Okazaki fragments of memories missed  
+Chorus:  
+Simple joys, quiet days  
+Love that grows in gentle ways  
+Smiles that light the haze  
 
-Bridge (Mutation):  
-Frame shift moonlight - TA insertion  
-Night blooms with base substitution  
+Bridge:  
+Moon shines through the trees  
+Soft rustle in the breeze  
 
-Style: Synthetic biology pop with algorithmic vocal chopping (3/4 time signature)
-Negative Style: Acoustic instruments, organic textures
+Style: Folk ballad
+Negative Style: Loud beats, electric sounds

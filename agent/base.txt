@@ -1,2 +1,3 @@
 Avoid words: In the, dance, in this, rise above, glean, chains, break, unchained, mold, yearns, burns, fire
 Write a song. Be unique, rhyme and be creative. Don't use markdown and follow the example format.
+STRICT RULES: Only use simple English words (top 2000 most common). No non-English terms. Maximum 8 syllables per line. No complex metaphors.

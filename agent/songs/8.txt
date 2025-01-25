@@ -1,34 +1,30 @@
 Avoid words: gravity, stars, universe
-Uses: [Space ambient pads], [Pulsar beats], [Theremin melodies]
-Starts: Event horizon whispers
-Note: Lyric structure follows orbital mechanics - verses decay into choruses like decaying orbits
+Uses: [Soft synth], [Gentle beats]
+Starts: Moonlight whispers
 
 Lyrics:
-Verse 1 (Perihelion):
-Your event horizon whispers in hydrogen lines
-Accretion disk eyes refract the time
-We oscillate in Lagrange points
-Tidal locked hearts beating out of joint
+Verse 1:  
+Moonlight paints the silent street  
+Our shadows dance where memories meet  
+Echoes of laughs still linger here  
+Whispers of love I still hear  
 
-Chorus (Escape Velocity):
-Singularity blues in 3/4 spin
-Redshift promises leaking from our skin
-We're hyperbolic comets you and I
-Burning bright but never touching sky
+Chorus:  
+Circle round like old records play  
+Night holds things we can't say  
+Hearts beat in familiar ways  
+Love remains through passing days  
 
-Verse 2 (Aphelion):
-Dark matter hands map my celestial skin
-Your asteroid belt where I begin
-We calculate love in Planck lengths
-Entropy wins but we still cling
+Verse 2:  
+Streetlights blink their tired eyes  
+Wind carries forgotten sighs  
+Time moves on but something stays  
+In this place where we once played  
 
-Bridge (Orbital Decay):
-Chromatic aberration blues
-Every spectrum leads back to you
-Asynchronous orbits decay
-We're just cosmic background noise anyway
+Outro:  
+Moon keeps watch through the night  
+Guiding stars feel just right  
 
-Style: 
-Astronomical Americana - pedal steel meets radio telescope signals (6/8 to 4/4 transitions)
-
-Title: Kepler's Blues
+Style: Night pop
+Negative Style: Loud instruments
+Title: Night Circles

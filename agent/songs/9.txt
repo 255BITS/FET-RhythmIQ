@@ -1,36 +1,32 @@
-Avoid words: clock, paradox, machine
-Uses: [Magnetic tape percussion], [Fugue counterpoint], [Pitch-bent arpeggiators]
-Starts: Wax cylinder hiss
-Note: Bassline follows Gregorian chant modes played backwards
+Avoid words: clock, mystery, tool
+Uses: [Tape sound], [Piano], [Soft vocals]
+Starts: Clocktower chimes
 
 Lyrics:
-Verse 1 (1710):  
-Quill scratches parchment concert A  
-Harpsichord springs keep courtly time  
-Your minuet traces my heart's crime  
-In parallel fifths we disobey  
+Verse 1:  
+Old bell shadows mark our rhyme  
+Your walk plays forward, mine rewinds  
+Each step echoes through hollow years  
+We dance apart yet somehow near  
+ 
+Chorus:  
+Meet me where past meets tomorrow  
+In the space between joy and sorrow  
+Your hand in mine across the years  
+Time's river bends but disappears  
 
-Chorus (3030):  
-Δt = 0 → Meet me where tenses collide  
-You're my phase shift, my causal tide  
-Tide causal my, shift phase my You're  
-Collide tenses where me Meet ← 0 = tΔ  
+Verse 2:  
+Mirror images face to face  
+Yesterday's smile, tomorrow's grace  
+The music swells then fades away  
+We find our rhythm in delay  
 
-Verse 2 (1710⁻¹):  
-Disobey we fifths parallel In  
-Crime heart's my traces minuet Your  
-Time courtly keep springs Harpsichord  
-A concert parchment scratches Quill  
+Bridge:  
+Chimes collide in midnight air  
+Two hearts beat as one pair  
 
-Bridge (1440):  
-Press (Gutenberg) our lips to type  
-Each (moveable) kiss in leaden night  
-Matrix (rhymes) with inky flesh  
-Tomorrow's Bible: Our score enmeshed  
+Style: 
+Simple waltz - piano (3/4 time)
+Negative Style: Electronic beats, complex rhythms
 
-[Fibonacci breakdown: Syllables per line 1,1,2,3,5,8]
-
-Style:
-Chronocore - Baroque fugue meets glitch hop (3/4 vs 4/4 polyrhythms)
-Negative Style: Linear time structures, non-palindromic arrangements
-Title: Temporal Fugue
+Title: Across the Hours

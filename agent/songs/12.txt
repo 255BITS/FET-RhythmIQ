@@ -1,40 +1,30 @@
 Avoid words: grow, bloom, roots
-Uses: [Xylem basslines], [Phloem harmonies], [Circadian rhythm sequencer]
-Starts: ATP hum at dawn
-Note: Verse syllable counts follow Fibonacci sequence (5,8,13 per line)
+Uses: [Nature sounds], [Gentle drums]
+Starts: Morning light
 
 Lyrics:
-Verse 1 (Thylakoid Dawn):  
-Five photons kiss chlorophyll  
-Eight electrons climb waterfall hill  
-Thirteen nanograms of glucose made  
+Verse 1:  
+Morning light wakes sleeping trees  
+Dew drops dance in gentle breeze  
+Nature hums its quiet song  
+World feels right where we belong
  
-Pre-Chorus (PSII Splitting):  
-H₂O cracks like morning ice  
-Oxygen exhale pays the price  
+Chorus:  
+Sun and rain take turns to play  
+Night gives way to brighter day  
+Seasons turn but love stays true  
+Growing old while staying new  
 
-Chorus (Calvin Night):  
-Rubisco dances with CO₂  
-G3P sweetens midnight dew  
-ATP synthase spins moonlit true  
-Dark reactions craft morning's hue  
+Verse 2:  
+Rivers flow to distant seas  
+Carrying hopes like fallen leaves  
+Though the path may twist and bend  
+Journey matters in the end  
 
-Verse 2 (Stroma Noon):  
-Five degrees between light and shade  
-Eight guard cells trade water for trade  
-Thirteen cycles make one sugar's weight  
+Outro:  
+Moon rises soft and slow  
+Peaceful night, calm we know  
 
-Bridge (Crassulacean Acid):  
-Malate stores starlight in reverse  
-Succulent beats quench night's thirst  
-
-[Circadian breakdown: 24-beat rhythm section]
-
-Style:
-Photosynthetic folk - acoustic instruments with chloroplast soundscapes (6/8 time)
-
-Negative Style:
-Electronic beats, synth leads
-
-Title:
-Chlorophyll Sonata
+Style: Nature folk
+Negative Style: Electronic beats
+Title: Nature's Way
