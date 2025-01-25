@@ -55,7 +55,7 @@ async def update_queue():
     current_song_id = request.args.get("currentSongId")
     current_song = await Song.get(current_song_id)
     songs = await Song.get_songs_after(current_song, limit=10)
-    generating_songs = [s for s in songs if s.status not in ('complete', 'error')]
+    generating_songs = [s for s in songs if s.status not in ('complete', 'error', 'error singing')]
 
     if len(songs) < 6 and len(generating_songs) == 0:
         # Prevent duplicate generation if already processing
