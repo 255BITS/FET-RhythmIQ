@@ -1,0 +1,9 @@
+Compose a three-part round song about a mountain stream using only simple present tense verbs. Maintain perfect syllable symmetry across all parts.
+STRICT: No romantic/nature metaphors
+Song:
+Uses: [Nature echoes], [Layered vocals], [No instruments]
+Structure: Three identical verses that form harmony when staggered
+
+Note:
+- Each line must work as standalone melody
+- Syllable counts must match exactly across verses

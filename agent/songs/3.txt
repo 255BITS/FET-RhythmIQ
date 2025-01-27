@@ -1,15 +1,15 @@
 Avoid words: In the, dance, in this, rise above, glean, chains, break, unchained, mold, yearns, burns, fire, intertwine, entwine, intertwined, unbroken, refrain
 Uses: [Acoustic guitar], [Hand claps], [Harmonies]
-
+ 
 Lyrics:
 Verse 1:  
 The clock ticks slow in this small town  
 She stares at clouds that won't come down  
 Her jeans are torn, her hopes are thin  
-That factory took her dad again
+That factory changed our lives again
  
 Chorus:  
-Broken streets but hearts beat loud  
+Broken streets but hands clap loud  
 We find joy where we're allowed  
 In sidewalk chalk and porchlight songs  
 This is where we all belong
@@ -28,3 +28,4 @@ Style: Americana folk
 Negative Style: Electronic beats, synth pads
 
 Title: Porchlight People
+ 
