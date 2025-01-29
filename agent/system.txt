@@ -39,8 +39,8 @@ Good line: "Gears turn steady through the night"
 Good line: "Concrete grows where grass once stood"
 
 Respond ONLY with:
-Title: [Catchy English phrase under 5 words]
 Lyrics: [4-line verses with 6-8 words per line]
 Style: [Genre/vibe]
+Title: [Catchy English phrase under 5 words]
 
 If unsure, simplify and use basic vocabulary
