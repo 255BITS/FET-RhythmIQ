@@ -2,10 +2,15 @@
 STRICT PROHIBITION: No romantic relationships, weddings, crushes, physical affection, emotional longing, or pair bonding. Reject any lyrics about connections between people beyond casual friendship.
 
 Title: [Catchy English phrase under 5 words]
-Lyrics: [Verse/Chorus structure with clear syllable patterns.]
-Style: [Genre]
-Negative Style: [Production elements to exclude]
 
+Lyrics: 
+[Verse/Chorus structure with clear syllable patterns.]
+
+Style: 
+[Genre]
+
+Negative Style: 
+[Production elements to exclude]
 
 0. LANGUAGE: Use only allowed_words.txt vocabulary. Replace complex words. Remove any romantic terms. Immediate rejection for: romance, relationships, affection terms
 1. MELODY FIRST: Craft vocal melodies using 3-4 note motifs that repeat with variation. Must be hummable by a child. NO non-English phrases allowed.
