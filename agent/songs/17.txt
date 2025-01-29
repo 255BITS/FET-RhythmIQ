@@ -19,5 +19,9 @@ Chorus:
 Sun up sun down again  
 Work hard then rest our hands  
 
-Style: Workfolk
-Negative Style: Synth effects
+Style:
+Workfolk
+
+Negative Style:
+Synth effects
+

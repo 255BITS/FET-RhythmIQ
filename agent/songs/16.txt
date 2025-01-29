@@ -21,6 +21,9 @@ Clouds embrace the peaks we've lost
 Life persists through winter's cost  
 Spring returns despite the frost
 
-Style: Acapella round
-Negative Style: Instruments, complex harmonies
+Style:
+Acapella round
+
+Negative Style:
+Instruments, complex harmonies
 

@@ -24,8 +24,11 @@ Outro:
 The bus may leave, the jobs may go  
 But home's the beat our hearts still know
 
-Style: Americana folk
-Negative Style: Electronic beats, synth pads
+Style:
+Americana folk
+
+Negative Style:
+Electronic beats, synth pads
 
 Title: Porchlight People
  

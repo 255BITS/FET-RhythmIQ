@@ -23,5 +23,9 @@ Yo ho ho through midnight mist
 
 [Foghorn blast]
 
-Style: Industrial harbor chant
-Negative Style: Clean production
+Style:
+Industrial harbor chant
+
+Negative Style:
+Clean production
+

@@ -25,6 +25,10 @@ Outro:
 Moon rises soft and slow  
 Peaceful night, calm we know  
 
-Style: Nature folk
-Negative Style: Electronic beats
+Style:
+Nature folk
+
+Negative Style:
+Electronic beats
+
 Title: Nature's Way

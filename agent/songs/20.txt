@@ -21,5 +21,9 @@ Six hearts write the final page
 Seven turns of timeless age  
 Eight hands close the looping cage
 
-Style: Loopfolk acoustic
-Negative Style: Electronic instruments
+Style:
+Loopfolk acoustic
+
+Negative Style:
+Electronic instruments
+

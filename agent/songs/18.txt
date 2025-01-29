@@ -19,5 +19,9 @@ Chorus:
 Day begins with tools in hand  
 Building things that truly stand  
 
-Style: Workshop rhythm
-Negative Style: Digital effects
+Style:
+Workshop rhythm
+
+Negative Style:
+Digital effects
+

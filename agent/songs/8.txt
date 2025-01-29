@@ -24,6 +24,10 @@ In steel beams that frame our names
 Outro: Cranes trace paths in morning light  
 Day shift starts the cycle right  
 
-Style: Night pop
-Negative Style: Loud instruments
+Style:
+Night pop
+
+Negative Style:
+Loud instruments
+
 Title: Night Circles
