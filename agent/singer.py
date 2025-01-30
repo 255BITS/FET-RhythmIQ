@@ -130,7 +130,7 @@ def send_payload(prompt, server=LOCAL_SERVER_ADDRESS, port=LOCAL_SERVER_PORT):
     # Define the generation parameters
     params = {
         "messages": [{"role": "user", "content": prompt}],
-        "max_tokens": 4096
+        "max_tokens": 8192
     }
 
     # Prepare the payload
