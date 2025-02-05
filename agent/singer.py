@@ -4,6 +4,7 @@ import json
 from dotenv import load_dotenv
 import random
 import re  # Added for regex parsing
+from xml_tools import toolbox, parser, formatter
 
 # Load environment variables from a .env file if present
 load_dotenv()
@@ -230,41 +231,22 @@ def generate_song(instruction=None):
         return None
 
 def parse_song_response(response_text):
-    """
-    Parses the response text from the GPT model and extracts song data.
-
-    Args:
-        response_text (str): The raw text response from the GPT model.
-
-    Returns:
-        dict: A dictionary containing song data.
-    """
-    song_data = {}
     try:
-        # Use regex to extract different parts of the song.txt content
-        title_match = re.search(r'Title:\s*(.*)', response_text, re.DOTALL)
-        lyrics_match = re.search(r'Lyrics:\s*(.*?)Style', response_text, re.DOTALL)
-        style_match = re.search(r'Style:\s*(.*?)\n\n', response_text, re.DOTALL)
-        negative_style_match = re.search(r'Negative Style:\s*(.*?)\n\n', response_text, re.DOTALL)
-
-        # Extracted data
-        title = title_match.group(1).strip()[:80] if title_match else "No title found"
-        if not lyrics_match:
-            assert False, "No lyrics found"
-        lyrics = lyrics_match.group(1).strip()[:3000]
-        style = style_match.group(1).strip()[:120] if style_match else "No style found"
-        negative_style = negative_style_match.group(1).strip()[:120] if negative_style_match else ""
-
-
-        song_data['title'] = title
-        song_data['lyrics'] = lyrics
-        song_data['style'] = style
-        song_data['negative_style'] = negative_style
-
+         # Construct tool usage calls in XML format using the designated tag.
+         response_calls = (
+             f"<use_tool name=\"parse_title\"><xml_content>{response_text}</xml_content></use_tool>\n"
+             f"<use_tool name=\"parse_lyrics\"><xml_content>{response_text}</xml_content></use_tool>\n"
+             f"<use_tool name=\"parse_style\"><xml_content>{response_text}</xml_content></use_tool>\n"
+             f"<use_tool name=\"parse_negative_style\"><xml_content>{response_text}</xml_content></use_tool>"
+         )
+         events = parser.parse(response_calls)
+         results = {}
+         for event in events:
+             results[event["name"]] = toolbox.use(event)
+         return results
     except Exception as e:
-        print(f"Error parsing song response: {e}")
-
-    return song_data
+         print(f"Error parsing song XML with toolbox: {e}")
+         return {}
 
 def main():
     """
@@ -275,13 +257,12 @@ def main():
 
     if song_data:
         print("\nGenerated Song Data:")
-        print(f"Title: {song_data['title']}")
-        print(f"Lyrics:\n{song_data['lyrics']}")
-        print(f"Style: {song_data['style']}")
-        print(f"Negative Style: {song_data['negative_style']}")
+        print(f"Title: {song_data.get('parse_title', 'No title found')}")
+        print(f"Lyrics:\n{song_data.get('parse_lyrics', 'No lyrics found')}")
+        print(f"Style: {song_data.get('parse_style', 'No style found')}")
+        print(f"Negative Style: {song_data.get('parse_negative_style', '')}")
     else:
         print("Song generation failed.")
 
 if __name__ == "__main__":
     main()
-

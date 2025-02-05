@@ -1,7 +1,7 @@
-Avoid words: emotion, feeling, wire
-Uses: [Repeating melodies]
-
-Lyrics:  
+<song>
+  <avoid>emotion, feeling, wire</avoid>
+  <uses>[Repeating melodies]</uses>
+  <lyrics>
 Do wires hum when lights stay low?
 Static whispers what we used to know
 Can circuits keep what memories show?
@@ -19,11 +19,8 @@ Morning comes to heal old pains
 
 Do wires hum when lights go low?
 Moon whispers things we used to know
-
-Style:
-Soft electronic with piano
-
-Negative Style:
-Loud beats, complex rhythms
-
-Title: Night Whispers
+  </lyrics>
+  <style>Soft electronic with piano</style>
+  <negative_style>Loud beats, complex rhythms</negative_style>
+  <title>Night Whispers</title>
+</song>

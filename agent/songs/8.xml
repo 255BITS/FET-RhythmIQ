@@ -1,33 +1,27 @@
-Avoid words: gravity, stars, universe
-Uses: [Soft synth], [Gentle beats]
-Starts: Moonlight whispers
-
-Lyrics:
-Verse 1:
+<song>
+  <avoid>gravity, stars, universe</avoid>
+  <uses>[Soft synth], [Gentle beats]</uses>
+  <starts>Moonlight whispers</starts>
+  <lyrics>
 Moonlight paints the empty street
 Shadows mark where workers meet
 Echoes of hammers fill the air
 Proof of hands that built with care
 
-Chorus:  
 Circle round the worksite fire
 Shared resolve burns ever higher
 Hands worn rough but spirits true
 Night shift crew sees morning through
 
-Verse 2:  
 Streetlights watch the loading dock
 Wind carries the shift bell's knock
 Time moves on but pride remains
 In steel beams that frame our names
 
-Outro: Cranes trace paths in morning light  
-Day shift starts the cycle right  
-
-Style:
-Night pop
-
-Negative Style:
-Loud instruments
-
-Title: Night Circles
+Cranes trace paths in morning light
+Day shift starts the cycle right
+  </lyrics>
+  <style>Night pop</style>
+  <negative_style>Loud instruments</negative_style>
+  <title>Night Circles</title>
+</song>
