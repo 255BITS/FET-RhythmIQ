@@ -231,25 +231,21 @@ def generate_song(instruction=None):
         return None
 
 def parse_song_response(response_text):
-    try:
-         # Directly parse the AI response which is expected to be in valid XML tool call format.
-         events = parser.parse(response_text)
-         results = {}
-         for event in events:
-             output = toolbox.use(event)
-             # Map tool names to expected keys
-             if event["name"] == "parse_title":
-                 results["title"] = output
-             elif event["name"] == "parse_lyrics":
-                 results["lyrics"] = output
-             elif event["name"] == "parse_style":
-                 results["style"] = output
-             elif event["name"] == "parse_negative_style":
-                 results["negative_style"] = output
-         return results
-    except Exception as e:
-         print(f"Error parsing song XML with toolbox: {e}")
-         return {}
+    # Since the song XML is provided directly (without a tool wrapper),
+    # we manually create tool call events for each registered parsing tool.
+    results = {}
+    for tool in ["parse_title", "parse_lyrics", "parse_style", "parse_negative_style"]:
+        event = {"name": tool, "args": {"xml_content": response_text}}
+        output = toolbox.use(event)
+        if tool == "parse_title":
+            results["title"] = output
+        elif tool == "parse_lyrics":
+            results["lyrics"] = output
+        elif tool == "parse_style":
+            results["style"] = output
+        elif tool == "parse_negative_style":
+            results["negative_style"] = output
+    return results
 
 def main():
     """
