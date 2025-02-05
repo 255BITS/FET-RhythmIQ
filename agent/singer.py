@@ -232,17 +232,20 @@ def generate_song(instruction=None):
 
 def parse_song_response(response_text):
     try:
-         # Construct tool usage calls in XML format using the designated tag.
-         response_calls = (
-             f"<use_tool name=\"parse_title\"><xml_content>{response_text}</xml_content></use_tool>\n"
-             f"<use_tool name=\"parse_lyrics\"><xml_content>{response_text}</xml_content></use_tool>\n"
-             f"<use_tool name=\"parse_style\"><xml_content>{response_text}</xml_content></use_tool>\n"
-             f"<use_tool name=\"parse_negative_style\"><xml_content>{response_text}</xml_content></use_tool>"
-         )
-         events = parser.parse(response_calls)
+         # Directly parse the AI response which is expected to be in valid XML tool call format.
+         events = parser.parse(response_text)
          results = {}
          for event in events:
-             results[event["name"]] = toolbox.use(event)
+             output = toolbox.use(event)
+             # Map tool names to expected keys
+             if event["name"] == "parse_title":
+                 results["title"] = output
+             elif event["name"] == "parse_lyrics":
+                 results["lyrics"] = output
+             elif event["name"] == "parse_style":
+                 results["style"] = output
+             elif event["name"] == "parse_negative_style":
+                 results["negative_style"] = output
          return results
     except Exception as e:
          print(f"Error parsing song XML with toolbox: {e}")
@@ -257,10 +260,10 @@ def main():
 
     if song_data:
         print("\nGenerated Song Data:")
-        print(f"Title: {song_data.get('parse_title', 'No title found')}")
-        print(f"Lyrics:\n{song_data.get('parse_lyrics', 'No lyrics found')}")
-        print(f"Style: {song_data.get('parse_style', 'No style found')}")
-        print(f"Negative Style: {song_data.get('parse_negative_style', '')}")
+        print(f"Title: {song_data.get('title', 'No title found')}")
+        print(f"Lyrics:\n{song_data.get('lyrics', 'No lyrics found')}")
+        print(f"Style: {song_data.get('style', 'No style found')}")
+        print(f"Negative Style: {song_data.get('negative_style', '')}")
     else:
         print("Song generation failed.")
 
