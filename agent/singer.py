@@ -174,7 +174,7 @@ def generate_song(instruction=None):
 
     # Get random song files for examples
     try:
-        song_files = [f for f in os.listdir("songs") if f.endswith('.txt')]
+        song_files = [f for f in os.listdir("songs") if f.endswith('.xml')]
         if not song_files:
             raise FileNotFoundError("No song files found in songs directory")
 
