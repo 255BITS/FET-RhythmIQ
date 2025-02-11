@@ -1,7 +1,5 @@
-<song>
-  <avoid>In the, dance, in this, rise above, glean, chains, break, unchained, mold, yearns, burns, fire, intertwine, entwine, intertwined, unbroken, refrain</avoid>
-  <uses>[Acoustic guitar], [Hand claps], [Harmonies]</uses>
-  <lyrics>
+<uses>[Acoustic guitar], [Hand claps], [Harmonies]</uses>
+<lyrics>
 The clock ticks slow in this small town
 She stares at clouds that won't come down
 Her jeans are torn, her hopes are thin
@@ -19,8 +17,6 @@ Right here's where we all belong
 
 The bus may leave, the jobs may go
 But home's the beat our hearts still know
-  </lyrics>
-  <style>Americana folk</style>
-  <negative_style>Electronic beats, synth pads</negative_style>
-  <title>Porchlight People</title>
-</song>
+</lyrics>
+<style>Americana folk</style>
+<negative_style>Electronic beats, synth pads</negative_style>
