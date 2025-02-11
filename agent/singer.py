@@ -15,13 +15,14 @@ GPT_PROVIDER = os.getenv("GPT_PROVIDER", "nanogpt").lower()  # Default to 'nanog
 N_SHOT = int(os.getenv("N_SHOT", "2"))  # Number of example songs to include
 
 # Configuration for NanoGPT API
-NANOGPT_BASE_URL = "https://nano-gpt.com/api"
 NANOGPT_API_KEY = os.getenv("NANOGPT_API_KEY")
 NANOGPT_DEFAULT_MODEL = os.getenv("NANOGPT_MODEL", "o3-mini")
+NANOGPT_BASE_URL = "https://nano-gpt.com/api/v1"
 
 # Configuration for Local Server
 LOCAL_SERVER_ADDRESS = os.getenv("LOCAL_SERVER_ADDRESS", "127.0.0.1")
 LOCAL_SERVER_PORT = os.getenv("LOCAL_SERVER_PORT", "5000")  # Ensure it's a string
+
 
 print(f"Using GPT Provider: {GPT_PROVIDER.capitalize()}")
 
@@ -60,31 +61,43 @@ def validate_environment():
 
 def talk_to_gpt(prompt, model=NANOGPT_DEFAULT_MODEL, messages=None):
     """
-    Sends a prompt to the NanoGPT API and returns the response.
+    Sends a prompt to the NanoGPT API using the OpenAI-compatible chat completions endpoint
+    and returns the response in the same format as before.
 
     Args:
         prompt (str): The input prompt to send to the model.
         model (str): The model to use for generation.
-        messages (list): Optional list of messages for context.
+        messages (list): Optional list of message dictionaries for context.
+                         If provided, the prompt is appended as a user message.
 
     Returns:
-        dict: Parsed JSON response from NanoGPT API containing the generated text and additional info.
+        dict: A dictionary with two keys:
+              - "text_response": The generated text from the assistant.
+              - "nano_info": Additional info (e.g. usage statistics) from the API.
     """
     headers = {
-        "x-api-key": NANOGPT_API_KEY,
+        "Authorization": f"Bearer {NANOGPT_API_KEY}",
         "Content-Type": "application/json"
     }
 
+    # If no messages are provided, create one using the prompt;
+    # otherwise, append the prompt as a user message.
     if messages is None:
-        messages = []
+        messages = [{"role": "user", "content": prompt}]
+    else:
+        if prompt and prompt.strip():
+            messages.append({"role": "user", "content": prompt})
 
+    # Build the payload using OpenAI-compatible parameters.
     data = {
-        "prompt": prompt,
         "model": model,
-        "messages": messages
+        "messages": messages,
+        "temperature": 0.8,
+        "top_p": 0.99,
+        "stream": False  # Non-streaming mode so that we get one complete response.
     }
 
-    endpoint = f"{NANOGPT_BASE_URL}/talk-to-gpt"
+    endpoint = f"{NANOGPT_BASE_URL}/chat/completions"
 
     try:
         response = requests.post(endpoint, headers=headers, json=data)
@@ -93,25 +106,26 @@ def talk_to_gpt(prompt, model=NANOGPT_DEFAULT_MODEL, messages=None):
         print(f"HTTP Request to NanoGPT failed: {e}")
         return None
 
-    # Assuming the response text contains JSON separated by <NanoGPT> tags
     try:
-        parts = response.text.split('<NanoGPT>')
-        if len(parts) < 2:
-            print("Unexpected response format from NanoGPT API.")
-            return None
-
-        # Extract the text response (everything before <NanoGPT>)
-        text_response = parts[0].strip()
-
-        # Extract the NanoGPT info
-        nano_info_str = parts[1].split('</NanoGPT>')[0]
-        nano_info = json.loads(nano_info_str)
-
+        result = response.json()
+        # Expected response format (non-streaming) is similar to OpenAI's:
+        # {
+        #    "id": "...", "object": "chat.completion", "created": ...,
+        #    "model": "...",
+        #    "choices": [{
+        #         "index": 0,
+        #         "message": {"role": "assistant", "content": "generated text"},
+        #         "finish_reason": "stop"
+        #    }],
+        #    "usage": { ... }
+        # }
+        text_response = result["choices"][0]["message"]["content"]
+        nano_info = result.get("usage", {})
         return {
             "text_response": text_response,
             "nano_info": nano_info
         }
-    except (IndexError, json.JSONDecodeError) as e:
+    except (KeyError, json.JSONDecodeError) as e:
         print(f"Error parsing NanoGPT response: {e}")
         return None
 
