@@ -15,7 +15,7 @@ def write_song(title, lyrics, style, negative_style):
     }
 
 toolbox.add_tool(
-    name="write_song",
+    name="song",
     fn=write_song,
     args={
         "title": {"type": "string", "description": "The title of the song"},
@@ -23,7 +23,7 @@ toolbox.add_tool(
         "style": {"type": "string", "description": "The style of the song"},
         "negative_style": {"type": "string", "description": "Any negative style elements of the song"}
     },
-    description="Parses song XML and extracts title, lyrics, style, and negative_style."
+    description="Write a song."
 )
 
 
