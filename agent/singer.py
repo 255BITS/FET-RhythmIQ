@@ -17,7 +17,7 @@ N_SHOT = int(os.getenv("N_SHOT", "2"))  # Number of example songs to include
 # Configuration for NanoGPT API
 NANOGPT_BASE_URL = "https://nano-gpt.com/api"
 NANOGPT_API_KEY = os.getenv("NANOGPT_API_KEY")
-NANOGPT_DEFAULT_MODEL = os.getenv("NANOGPT_MODEL", "o1-mini")
+NANOGPT_DEFAULT_MODEL = os.getenv("NANOGPT_MODEL", "o3-mini")
 
 # Configuration for Local Server
 LOCAL_SERVER_ADDRESS = os.getenv("LOCAL_SERVER_ADDRESS", "127.0.0.1")
@@ -44,7 +44,6 @@ def load_random_instruction():
     except Exception as e:
         print(f"Error loading random instruction: {e}")
         return None
-
 
 def validate_environment():
     """
@@ -193,6 +192,7 @@ def generate_song(instruction=None):
         for idx, song_file in enumerate(selected_songs):
             with open(f"songs/{song_file}", "r") as song_f:
                 song_content = song_f.read().strip()
+                song_content = f"<use_tool>{song_content}</use_tool>"
             examples.append(f"\nExample {idx + 1}:\nSong:\n{song_content}")
 
         # Build the user prompt
@@ -231,21 +231,12 @@ def generate_song(instruction=None):
         return None
 
 def parse_song_response(response_text):
-    # Since the song XML is provided directly (without a tool wrapper),
-    # we manually create tool call events for each registered parsing tool.
-    results = {}
-    for tool in ["parse_title", "parse_lyrics", "parse_style", "parse_negative_style"]:
-        event = {"name": tool, "args": {"xml_content": response_text}}
-        output = toolbox.use(event)
-        if tool == "parse_title":
-            results["title"] = output
-        elif tool == "parse_lyrics":
-            results["lyrics"] = output
-        elif tool == "parse_style":
-            results["style"] = output
-        elif tool == "parse_negative_style":
-            results["negative_style"] = output
-    return results
+    events = parser.parse(response_text)
+    for event in events:
+        if event.is_tool_use:
+            return toolbox.use(event)
+    print("No write_song event found in the response.")
+    return {}
 
 def main():
     """
