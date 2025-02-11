@@ -119,19 +119,37 @@ def generate_audio(title, lyrics, style, negative_style):
 def poll_for_audio(song_ids):
     headers = {
         'Content-Type': 'application/json',
-        'api-key': fox_api_key
+        'api-key': fox_api_key  # Make sure fox_api_key is defined elsewhere
     }
     params = {
         'ids': ','.join(song_ids)
     }
-    response = requests.get('https://api.sunoaiapi.com/api/v1/gateway/query', params=params, headers=headers)
-    print("Polling response:", response.status_code)
-    print(json.dumps(response.json(), indent=2))
-    if response.status_code == 200:
-        resp_data = response.json()
-        return resp_data
-    else:
-        return None
+    
+    max_attempts = 3   # Number of times to try
+    delay_seconds = 1  # Delay in seconds between attempts
+
+    for attempt in range(1, max_attempts + 1):
+        try:
+            response = requests.get('https://api.sunoaiapi.com/api/v1/gateway/query',
+                                    params=params, headers=headers)
+            print(f"Polling attempt {attempt}, response: {response.status_code}")
+            response_data = response.json()
+            print(json.dumps(response_data, indent=2))
+            
+            if response.status_code == 200:
+                return response_data
+            else:
+                print(f"Attempt {attempt} failed with status code {response.status_code}.")
+        except Exception as e:
+            print(f"Attempt {attempt} encountered an exception: {e}")
+        
+        # Only sleep if there are more attempts to try
+        if attempt < max_attempts:
+            print(f"Waiting for {delay_seconds} seconds before retrying...")
+            time.sleep(delay_seconds)
+
+    print("All attempts failed. Returning None.")
+    return None
 
 # Function to wait until all songs are complete
 def poll_until_complete(song_ids):
