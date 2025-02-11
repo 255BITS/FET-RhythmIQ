@@ -192,7 +192,7 @@ def generate_song(instruction=None):
         for idx, song_file in enumerate(selected_songs):
             with open(f"songs/{song_file}", "r") as song_f:
                 song_content = song_f.read().strip()
-                song_content = f"<use_tool>{song_content}</use_tool>"
+                song_content = f"<use_tool><name>song</name>{song_content}</use_tool>"
             examples.append(f"\nExample {idx + 1}:\nSong:\n{song_content}")
 
         # Build the user prompt
