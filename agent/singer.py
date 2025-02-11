@@ -232,8 +232,9 @@ def generate_song(instruction=None):
 
 def parse_song_response(response_text):
     events = parser.parse(response_text)
+    print("Parsing", response_text)
     for event in events:
-        if event.is_tool_use:
+        if event.is_tool_call:
             return toolbox.use(event)
     print("No write_song event found in the response.")
     return {}
