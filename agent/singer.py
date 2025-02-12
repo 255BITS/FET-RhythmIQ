@@ -212,7 +212,7 @@ def generate_song(instruction=None):
         #    examples.append(f"\nExample {idx + 1}:\nSong:\n{song_content}")
 
         # Build the user prompt
-        user_prompt = formatter.usage_prompt(toolbox)+"\n\n"+base_prompt#f"{base_prompt}\n{''.join(examples)}\n\nInstructions:\n{instruction}"
+        user_prompt = formatter.usage_prompt(toolbox)+"\n\n"+base_prompt+"\n\nAdditional Instructions:\n{instruction}"#f"{base_prompt}\n{''.join(examples)}\n\nInstructions:\n{instruction}"
         print("SYSTEM", system_prompt, "USER", user_prompt)
 
     except FileNotFoundError as e:
