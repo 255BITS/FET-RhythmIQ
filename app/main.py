@@ -6,6 +6,7 @@ import os
 import json
 import uuid
 import logging
+from datetime import timedelta
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG,
@@ -43,8 +44,26 @@ async def favorites():
     """
     List all songs favorited by users.
     """
-    favorites = await Song.get_all_favorites()
-    return await render_template('favorites.html', favorites=favorites, current_song=favorites[0])
+    filter_param = request.args.get("filter", "all_time")
+    if filter_param == "last_week":
+        delta = timedelta(days=7)
+        favorites = await Song.get_all_favorites_filtered(delta)
+    elif filter_param == "last_month":
+        delta = timedelta(days=30)
+        favorites = await Song.get_all_favorites_filtered(delta)
+    elif filter_param == "last_3_months":
+        delta = timedelta(days=90)
+        favorites = await Song.get_all_favorites_filtered(delta)
+    elif filter_param == "last_year":
+        delta = timedelta(days=365)
+        favorites = await Song.get_all_favorites_filtered(delta)
+    else:
+        favorites = await Song.get_all_favorites()
+
+    print("favorites", favorites)
+
+    current_song = favorites[0] if favorites else None
+    return await render_template('favorites.html', favorites=favorites, current_song=current_song, filter=filter_param)
 
 @app.route('/create_song')
 async def create_song():

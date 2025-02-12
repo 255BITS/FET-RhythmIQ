@@ -70,6 +70,19 @@
         </button>
     </div>
 
+    <div class="favorites-filter mb-4">
+      <label for="favorites-time-filter" class="block text-sm font-medium text-gray-300">
+        Filter by Time:
+      </label>
+      <select id="favorites-time-filter" name="filter" onchange="location = this.value;" class="mt-1 block w-full pl-3 pr-10 py-2 text-base bg-gray-700 border border-gray-600 text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+        <option value="/favorites?filter=last_week" {{ 'selected' if filter == 'last_week' else '' }}>Last Week</option>
+        <option value="/favorites?filter=last_month" {{ 'selected' if filter == 'last_month' else '' }}>Last Month</option>
+        <option value="/favorites?filter=last_3_months" {{ 'selected' if filter == 'last_3_months' else '' }}>Last 3 Months</option>
+        <option value="/favorites?filter=last_year" {{ 'selected' if filter == 'last_year' else '' }}>Last Year</option>
+        <option value="/favorites?filter=all_time" {{ 'selected' if filter == 'all_time' or not filter else '' }}>All Time</option>
+      </select>
+    </div>
+
     <!-- Favorites Queue -->
     <div class="favorites-section">
       <h2 class="queue-title">Favorites</h2>

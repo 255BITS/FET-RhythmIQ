@@ -41,7 +41,29 @@ class Song:
                 """
             )
         return [cls(*row) for row in rows]
-    
+
+    @classmethod
+    async def get_all_favorites_filtered(cls, delta):
+        """
+        Fetch all songs that have been marked as favorites by any user within the given time interval.
+        `delta` should be a datetime.timedelta object.
+        """
+        # Compute the lower bound in Python.
+        lower_bound = datetime.utcnow() - delta
+        
+        async with pool.acquire() as conn:
+            rows = await conn.fetch(
+                """
+                SELECT DISTINCT s.*
+                FROM songs s
+                JOIN user_favorites uf ON s.id = uf.song_id
+                WHERE uf.created_at >= $1
+                ORDER BY s.favorite_count DESC, s.created_at DESC
+                """,
+                lower_bound
+            )
+        return [cls(*row) for row in rows]
+
     @classmethod
     async def create(cls, **kwargs):
         # Set default values for optional fields
@@ -97,6 +119,7 @@ class Song:
                 LIMIT $3
             """, song.created_at, song.generation_uuid, limit)
         return [cls(*row) for row in rows]
+
     @classmethod
     async def get_all(cls):
         async with pool.acquire() as conn:
@@ -298,5 +321,3 @@ async def init_db(pool_instance):
                 UNIQUE(user_id, song_id)
             );
         """)
-
-
