@@ -132,9 +132,9 @@ def poll_for_audio(song_ids):
         try:
             response = requests.get('https://api.sunoaiapi.com/api/v1/gateway/query',
                                     params=params, headers=headers)
-            print(f"Polling attempt {attempt}, response: {response.status_code}")
+            #print(f"Polling attempt {attempt}, response: {response.status_code}")
             response_data = response.json()
-            print(json.dumps(response_data, indent=2))
+            #print(json.dumps(response_data, indent=2))
             
             if response.status_code == 200:
                 return response_data
