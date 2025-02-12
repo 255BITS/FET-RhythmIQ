@@ -252,7 +252,8 @@ def parse_song_response(response_text):
     print("Parsing", response_text)
     for event in events:
         if event.is_tool_call:
-            return toolbox.use(event).result
+            if event.tool.name == "song":
+                return toolbox.use(event).result
     print("No write_song event found in the response.")
     return {}
 
