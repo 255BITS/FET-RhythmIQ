@@ -197,7 +197,7 @@ def generate_song(instruction=None):
         with open("system.txt", "r") as file:
             system_prompt = file.read().strip()
 
-        system_prompt += "\n"+formatter.usage_prompt(toolbox)
+        #system_prompt += "\n"+formatter.usage_prompt(toolbox)
         messages = [{"role": "system", "content": system_prompt}]
 
         # Select random examples
@@ -205,14 +205,14 @@ def generate_song(instruction=None):
         num_examples = min(N_SHOT, len(song_files))
         selected_songs = random.sample(song_files, num_examples)
 
-        for idx, song_file in enumerate(selected_songs):
-            with open(f"songs/{song_file}", "r") as song_f:
-                song_content = song_f.read().strip()
-                song_content = f"<use_tool>\n<name>song</name>\n{song_content}</use_tool>"
-            examples.append(f"\nExample {idx + 1}:\nSong:\n{song_content}")
+        #for idx, song_file in enumerate(selected_songs):
+        #    with open(f"songs/{song_file}", "r") as song_f:
+        #        song_content = song_f.read().strip()
+        #        song_content = f"<use_tool>\n<name>song</name>\n{song_content}</use_tool>"
+        #    examples.append(f"\nExample {idx + 1}:\nSong:\n{song_content}")
 
         # Build the user prompt
-        user_prompt = f"{base_prompt}\n{''.join(examples)}\n\nInstructions:\n{instruction}"
+        user_prompt = formatter.usage_prompt(toolbox)+"\n\n"+base_prompt#f"{base_prompt}\n{''.join(examples)}\n\nInstructions:\n{instruction}"
         print("SYSTEM", system_prompt, "USER", user_prompt)
 
     except FileNotFoundError as e:

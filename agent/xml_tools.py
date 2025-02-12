@@ -14,16 +14,29 @@ def write_song(title, lyrics, style, negative_style):
         "negative_style": negative_style
     }
 
+def thinking(thoughts=""):
+    print("I'm thinking:", thoughts)
+
 toolbox.add_tool(
     name="song",
     fn=write_song,
     args={
         "title": {"type": "string", "description": "The title of the song"},
         "lyrics": {"type": "string", "description": "The lyrics of the song"},
-        "style": {"type": "string", "description": "The style of the song"},
+        "style": {"type": "string", "description": "The style of the song. Greatly effects generation."},
         "negative_style": {"type": "string", "description": "Any negative style elements of the song"}
     },
     description="Write a song."
 )
 
-
+toolbox.add_tool(
+    name="thinking",
+    fn=thinking,
+    args={
+        "thoughts": {
+            "type": "string",
+            "description": "Anything you want to think about"
+        }
+    },
+    description="For thinking out loud"
+)

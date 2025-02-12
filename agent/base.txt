@@ -1,3 +1,1 @@
-Avoid words: In the, dance, in this, rise above, glean, chains, break, unchained, mold, yearns, burns, fire
-Write a song. Be unique, rhyme and be creative. Don't use markdown and follow the example format.
-STRICT RULES: Only use simple English words (top 2000 most common). No non-English terms. Maximum 8 syllables per line. No complex metaphors.
+Write a song. Be unique, rhyme well where applicable and be highly creative. This is going to be used in a suno AI music generation. Use the correct syntax. Think about the song first.
