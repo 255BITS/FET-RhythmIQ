@@ -82,7 +82,7 @@ async def update_queue():
         song1 = await Song.create(name="New Song 1", status="generating", generation_uuid=generation_uuid)
         song2 = await Song.create(name="New Song 2", status="generating", generation_uuid=generation_uuid)
         asyncio.create_task(generate_song_with_agent([song1, song2]))
-    return await render_template('partials/queue.html', songs=songs, song=current_song, number_generating = len(generating_songs))
+    return await render_template('partials/queue.html', songs=songs, song=current_song, number_generating=len(generating_songs))
 
 @app.route('/stream_music')
 async def stream_music():
@@ -255,6 +255,9 @@ def js_escape(value):
 
 app.jinja_env.filters['jsescape'] = js_escape
 app.secret_key = APP_SECRET
+
+from auth_routes import auth_bp
+app.register_blueprint(auth_bp)
 
 if __name__ == '__main__':
     app.run(debug=True, port=8257)
