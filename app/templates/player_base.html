@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RhythmIQ - Infinite AI Radio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+    <script src="https://unpkg.com/idiomorph@0.3.0/dist/idiomorph-ext.min.js"></script>
+    <script defer src="https://analytics.255labs.xyz/script.js" data-website-id="d7e942f5-8062-4621-9870-4e88e44f196f"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}?v=2">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body hx-ext="morph" class="bg-[#1a1b26] text-gray-100 font-sans" x-data="{
+    isMuted: false,
+    toggleMute() {
+        this.isMuted = !this.isMuted; const audioPlayer = document.getElementById('audio-player'); if (audioPlayer) { audioPlayer.muted = this.isMuted; }
+    },
+    isPlaying: false,
+    currentTime: 0,
+    duration: 0,
+    progress: 0,
+    isResumed: false,
+    currentSongId: {{ current_song.id }},
+    currentSongName: '{{ current_song.name|default('No track playing')|jsescape }}',
+    currentSongStyle: '{{ current_song.details.style|default('')|jsescape }}',
+    currentSongImage: '{{ current_song.image_large_url|default('/static/images/placeholder.jpg', true)|jsescape }}',
+    isFavorite: {{ 'true' if is_favorite else 'false' }},
+    favoriteCount: {{ current_song.favorite_count }},
+    lastFavoriteCount: {{ current_song.favorite_count }},
+    userId: '{{ user_id }}',
+    handleSongEnd() {
+        this.advanceSong();
+        if (this.isPlaying) {
+            this.$nextTick(() => {
+                this.$refs.audioPlayer.play();
+                fetch(`/song/${this.currentSongId}/listen`, { method: 'POST' });
+                this.isResumed = true;
+            });
+        }
+    },
+    skipSong() {
+        this.advanceSong();
+        if (this.isPlaying) {
+            this.$nextTick(() => {
+                this.$refs.audioPlayer.play();
+                fetch(`/song/${this.currentSongId}/listen`, { method: 'POST' });
+                this.isResumed = true;
+            });
+        }
+    },
+    advanceSong() {
+        const nextSong = this.getNextSong();
+        if (nextSong) {
+            this.currentSongId = nextSong.id;
+            this.$refs.audioPlayer.src = nextSong.audio_url;
+            this.$refs.audioPlayer.load();
+            this.updateSongInfo(nextSong);
+            const nextSongElement = document.querySelector('.queue-item');
+            if (nextSongElement) {
+                nextSongElement.parentNode.removeChild(nextSongElement);
+            }
+        } else {
+            this.isPlaying = false;
+        }
+    },
+    getNextSong() {
+        const queueItems = document.querySelectorAll('.queue-item');
+        if (queueItems.length > 0) {
+            const nextSongElement = queueItems[0];
+            return {
+                id: nextSongElement.dataset.songId,
+                audio_url: nextSongElement.dataset.audioUrl,
+                name: nextSongElement.dataset.name,
+                style: nextSongElement.dataset.style,
+                image_large_url: nextSongElement.dataset.imageUrl
+            };
+        } else {
+            return null;
+        }
+    },
+    updateSongInfo(data) {
+        this.currentSongName = data.name || 'No track playing';
+        this.currentSongStyle = data.style || '';
+        this.currentSongImage = data.image_large_url || '/static/images/placeholder.jpg';
+        this.updateFavoriteStatus();
+    },
+    updateSongId() {
+        this.isResumed = false;
+    },
+    updateProgress() {
+        this.currentTime = this.$refs.audioPlayer.currentTime;
+        this.duration = this.$refs.audioPlayer.duration || 0;
+        this.progress = (this.currentTime / this.duration) * 100;
+    },
+    seekSong(event) {
+        const progressBar = event.currentTarget;
+        const clickPosition = event.offsetX;
+        const barWidth = progressBar.offsetWidth;
+        const clickRatio = clickPosition / barWidth;
+        const newTime = clickRatio * this.duration;
+        this.$refs.audioPlayer.currentTime = newTime;
+        this.updateProgress();
+    },
+    toggleFavorite() {
+        const endpoint = this.isFavorite ? `/song/${this.currentSongId}/unfavorite` : `/song/${this.currentSongId}/favorite`;
+        fetch(endpoint, { 
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            this.isFavorite = data.is_favorite;
+            this.favoriteCount = data.favorite_count;
+            if(this.isFavorite) {
+              this.lastFavoriteCount += 1;
+            } else {
+              this.lastFavoriteCount -= 1;
+            }
+            if (!this.isFavorite) return;
+            this.animateHeart();
+        });
+    },
+    checkAndAnimateHearts(data) {
+        newCount = parseInt(data.favorite_count);
+        const diff = newCount - this.lastFavoriteCount;
+        if (diff > 0) {
+            this.animateMultipleHearts(diff);
+        }
+        this.favoriteCount = newCount;
+        this.lastFavoriteCount = newCount;
+    },
+    animateMultipleHearts(count) {
+        let heartsToAnimate;
+        if (count === 1) heartsToAnimate = 1;
+        else if (count <= 3) heartsToAnimate = count;
+        else if (count <= 10) heartsToAnimate = 4 + Math.floor(Math.random() * 3);
+        else heartsToAnimate = Math.ceil(Math.log(count)) + Math.floor(Math.random() * 3);
+
+        for (let i = 0; i < heartsToAnimate; i++) {
+            setTimeout(() => this.animateHeart(), i * 200);
+        }
+    },
+    animateHeart() {
+        const heartBtn = document.querySelector('.heart-btn');
+        const rect = heartBtn.getBoundingClientRect();
+        const heart = document.createElement('div');
+        heart.innerHTML = '❤️';
+        heart.classList.add('floating-heart');
+
+        heart.style.left = `${rect.left + rect.width / 2 + window.scrollX}px`;
+        heart.style.top = `${rect.top + rect.height / 2 + window.scrollY}px`;
+
+        const randomScale = 0.9 + Math.random() * 0.2;
+        const randomDuration = 1.2 + Math.random() * 0.3;
+        const randomDelay = Math.random() * 0.1;
+        const randomX = (Math.random() - 0.5) * 50;
+        const randomRotate = (Math.random() - 0.5) * 30;
+
+        heart.style.animationDuration = `${randomDuration}s`;
+        heart.style.animationDelay = `${randomDelay}s`;
+        
+        heart.style.setProperty('--random-x', `${randomX}px`);
+        heart.style.setProperty('--random-rotate', `${randomRotate}deg`);
+
+        document.body.appendChild(heart);
+
+        setTimeout(() => {
+            heart.remove();
+        }, (randomDuration + randomDelay) * 1000);
+    },
+    updateFavoriteStatus() {
+        fetch(`/song/${this.currentSongId}/favorite_count`)
+            .then(response => response.json())
+            .then(data => {
+                this.isFavorite = data.is_favorite;
+                this.favoriteCount = data.favorite_count;
+            });
+    },
+}">
+   <audio id="audio-player" x-ref="audioPlayer" src="{{ current_song.audio_url }}"
+        x-on:timeupdate="updateProgress()" x-on:loadstart="updateSongId()"
+        x-on:ended="handleSongEnd()"></audio>
+    <div class="max-w-4xl mx-auto p-6">
+        <div class="retro-player-container">
+            <div class="player-header">
+                <div class="logo-container">
+                    <span class="wave-icon">(((•)))</span>
+                    <h1 class="retro-title">RhythmIQ</h1>
+                </div>
+                <div class="volume-control">
+                    <button x-on:click="$refs.audioPlayer.muted = !$refs.audioPlayer.muted" x-text="$refs.audioPlayer.muted ? '🔇' : '🔊'" class="volume-icon"></button>
+                    <input 
+                        type="range" 
+                        min="0" max="1" 
+                        step="0.01" 
+                        x-on:input="$refs.audioPlayer.volume = $event.target.value; $event.target.style.setProperty('--volume-percent', ($event.target.value * 100) + '%')"
+                        class="volume-slider">
+                </div>
+            </div>
+
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
