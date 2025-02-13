@@ -7,6 +7,7 @@ import json
 import uuid
 import logging
 from datetime import timedelta
+import pg_simple_auth
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG,
@@ -24,8 +25,25 @@ APP_SECRET = os.getenv("APP_SECRET", "tempsecret123")
 
 @app.before_serving
 async def setup():
-    await init_db(await get_db_pool(DATABASE_URL))
+    pool = await get_db_pool(DATABASE_URL)
+    await init_db(pool)
 
+    auth_config = pg_simple_auth.AuthConfig(
+        jwt_expiration=3600 * 24 * 30,  # 1 month
+        max_login_attempts=10,
+        lockout_duration=300,
+        password_min_length=6,
+        password_require_uppercase=False,
+        password_require_lowercase=False,
+        password_require_digit=False,
+        password_require_special=False,
+    )
+    await pg_simple_auth.initialize(
+        pool=pool,
+        key=APP_SECRET,
+        table="public.user",
+        auth_config=auth_config
+    )
 
 @app.before_request
 async def before_request():

@@ -34,7 +34,7 @@ async def signup():
             await send_mail(email, subject, message)
             flash("Signup successful! Please check your email to verify your account.")
             return redirect(url_for('auth.login'))
-        except Exception as e:
+        except auth_module.UserExistsError as e:
             error = str(e)
             return await render_template('signup.html', error=error)
     return await render_template('signup.html')
