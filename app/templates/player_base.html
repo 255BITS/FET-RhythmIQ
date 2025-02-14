@@ -110,9 +110,14 @@
         })
         .then(response => response.json())
         .then(data => {
+            if (data.error && data.redirect) {
+                // Force a redirect to the login page if not authenticated
+                window.location.href = data.redirect;
+                return;
+            }
             this.isFavorite = data.is_favorite;
             this.favoriteCount = data.favorite_count;
-            if(this.isFavorite) {
+            if (this.isFavorite) {
               this.lastFavoriteCount += 1;
             } else {
               this.lastFavoriteCount -= 1;

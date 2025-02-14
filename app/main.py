@@ -123,7 +123,12 @@ async def listen(id):
 
 @app.route('/song/<int:id>/favorite', methods=['POST'])
 async def favorite_song(id):
-    user_id = session['temp_user_id']
+    if 'token' not in session:
+        return jsonify({
+            "error": "You must be logged in to favorite a song",
+            "redirect": "/login"
+        }), 401
+    user_id = session['token']
     song = await Song.get(id)
     if not song:
         return jsonify({"error": "Song not found"}), 404
@@ -138,7 +143,12 @@ async def favorite_song(id):
 
 @app.route('/song/<int:id>/unfavorite', methods=['POST'])
 async def unfavorite_song(id):
-    user_id = session['temp_user_id']
+    if 'token' not in session:
+        return jsonify({
+            "error": "You must be logged in to unfavorite a song",
+            "redirect": "/login"
+        }), 401
+    user_id = session['token']
     song = await Song.get(id)
     if not song:
         return jsonify({"error": "Song not found"}), 404
