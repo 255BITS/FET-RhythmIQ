@@ -27,6 +27,7 @@ async def signup():
         password = data.get('password')
         try:
             result = await auth_module.signup(email, password)
+            await auth_module.verify(result['verification_token'])
             # send verification email
             verification_link = url_for('auth.verify_email', token=result['verification_token'], _external=True)
             subject = "Verify your email"
