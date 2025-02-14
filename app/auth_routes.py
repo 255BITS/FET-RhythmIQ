@@ -83,3 +83,8 @@ async def reset_password(token):
         except Exception as e:
             await flash(str(e))
     return await render_template('reset_password.html', token=token)
+
+@auth_bp.route('/logout')
+async def logout():
+    session.pop('token', None)
+    return redirect(url_for('home'))

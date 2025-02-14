@@ -188,13 +188,21 @@
                     <span class="wave-icon">(((•)))</span>
                     <h1 class="retro-title">RhythmIQ</h1>
                 </div>
+                <div class="nav-links" style="margin: 0 1rem;">
+                    {% if session.token %}
+                        <a href="{{ url_for('auth.logout') }}" class="nav-link">Logout</a>
+                    {% else %}
+                        <a href="{{ url_for('auth.login') }}" class="nav-link">Login</a>
+                        <a href="{{ url_for('auth.signup') }}" class="nav-link">Sign Up</a>
+                    {% endif %}
+                </div>
                 <div class="volume-control">
                     <button x-on:click="$refs.audioPlayer.muted = !$refs.audioPlayer.muted" x-text="$refs.audioPlayer.muted ? '🔇' : '🔊'" class="volume-icon"></button>
                     <input 
                         type="range" 
                         min="0" max="1" 
                         step="0.01" 
-                        x-on:input="$refs.audioPlayer.volume = $event.target.value; $event.target.style.setProperty('--volume-percent', ($event.target.value * 100) + '%')"
+                        x-on:input="$refs.audioPlayer.volume = $event.target.value; $event.target.style.setProperty('--volume-percent', ($event.target.value * 100) + '%')" 
                         class="volume-slider">
                 </div>
             </div>
