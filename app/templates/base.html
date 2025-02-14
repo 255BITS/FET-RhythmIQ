@@ -14,6 +14,15 @@
 </head>
 <body class="bg-[#1a1b26] text-gray-100 font-sans">
     <div class="container mx-auto p-6">
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <div class="flash-messages mb-4">
+            {% for message in messages %}
+              <div class="alert alert-info">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
       {% block content %}{% endblock %}
     </div>
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
