@@ -178,6 +178,13 @@
             });
     },
 }">
+  <!-- Login/Signup Modal Container -->
+  <div id="loginModal" x-data="{ open: false }" x-ref="loginModal" x-show="open" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50" style="display: none;">
+    <div class="bg-gray-900 p-6 rounded-lg relative">
+      <button @click="open = false" class="absolute top-2 right-2 text-gray-400">&times;</button>
+      <div id="loginModalContent"></div>
+    </div>
+  </div>
    <audio id="audio-player" x-ref="audioPlayer" src="{{ current_song.audio_url }}"
         x-on:timeupdate="updateProgress()" x-on:loadstart="updateSongId()"
         x-on:ended="handleSongEnd()"></audio>
@@ -188,22 +195,22 @@
                     <span class="wave-icon">(((•)))</span>
                     <h1 class="retro-title">RhythmIQ</h1>
                 </div>
+                <div class="volume-control">
+                    <button x-on:click="$refs.audioPlayer.muted = !$refs.audioPlayer.muted" x-text="$refs.audioPlayer.muted ? '🔇' : '🔊'" class="volume-icon"></button>
+                    <input
+                        type="range"
+                        min="0" max="1"
+                        step="0.01"
+                        x-on:input="$refs.audioPlayer.volume = $event.target.value; $event.target.style.setProperty('--volume-percent', ($event.target.value * 100) + '%')"
+                        class="volume-slider">
+                </div>
                 <div class="nav-links" style="margin: 0 1rem;">
                     {% if session.token %}
                         <a href="{{ url_for('auth.logout') }}" class="nav-link">Logout</a>
                     {% else %}
-                        <a class="nav-link" onclick="openLoginModal(); return false;">Login</a>
-                        <a class="nav-link" onclick="openSignupModal(); return false;">Sign Up</a>
+                        <a class="nav-link" @click="$refs.loginModal.open = true" hx-get="{{ url_for('auth.login') }}" hx-target="#loginModalContent" hx-swap="innerHTML">Login</a>
+                        <a class="nav-link" @click="$refs.loginModal.open = true" hx-get="{{ url_for('auth.signup') }}" hx-target="#loginModalContent" hx-swap="innerHTML">Sign Up</a>
                     {% endif %}
-                </div>
-                <div class="volume-control">
-                    <button x-on:click="$refs.audioPlayer.muted = !$refs.audioPlayer.muted" x-text="$refs.audioPlayer.muted ? '🔇' : '🔊'" class="volume-icon"></button>
-                    <input 
-                        type="range" 
-                        min="0" max="1" 
-                        step="0.01" 
-                        x-on:input="$refs.audioPlayer.volume = $event.target.value; $event.target.style.setProperty('--volume-percent', ($event.target.value * 100) + '%')" 
-                        class="volume-slider">
                 </div>
             </div>
 

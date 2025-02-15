@@ -25,36 +25,7 @@
       {% endwith %}
       {% block content %}{% endblock %}
     </div>
-  <!-- Login/Signup Modal Container -->
-  <div id="loginModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
-    <div class="bg-gray-900 p-6 rounded-lg relative">
-      <button onclick="closeLoginModal()" class="absolute top-2 right-2 text-gray-400">&times;</button>
-      <div id="loginModalContent"></div>
-    </div>
-  </div>
-  <script>
-    function openLoginModal() {
-      const modal = document.getElementById('loginModal');
-      modal.classList.remove('hidden');
-      fetch('{{ url_for("auth.login") }}')
-        .then(response => response.text())
-        .then(html => {
-          document.getElementById('loginModalContent').innerHTML = html;
-        });
-    }
-    function openSignupModal() {
-      const modal = document.getElementById('loginModal');
-      modal.classList.remove('hidden');
-      fetch('{{ url_for("auth.signup") }}')
-        .then(response => response.text())
-        .then(html => {
-          document.getElementById('loginModalContent').innerHTML = html;
-        });
-    }
-    function closeLoginModal() {
-      document.getElementById('loginModal').classList.add('hidden');
-    }
-  </script>
+
   <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
 </html>
