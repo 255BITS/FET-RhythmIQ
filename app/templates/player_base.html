@@ -110,11 +110,6 @@
         })
         .then(response => response.json())
         .then(data => {
-            if (data.error && data.redirect) {
-                // Force a redirect to the login page if not authenticated
-                window.location.href = data.redirect;
-                return;
-            }
             this.isFavorite = data.is_favorite;
             this.favoriteCount = data.favorite_count;
             if (this.isFavorite) {
@@ -197,8 +192,8 @@
                     {% if session.token %}
                         <a href="{{ url_for('auth.logout') }}" class="nav-link">Logout</a>
                     {% else %}
-                        <a href="{{ url_for('auth.login') }}" class="nav-link">Login</a>
-                        <a href="{{ url_for('auth.signup') }}" class="nav-link">Sign Up</a>
+                        <a class="nav-link" onclick="openLoginModal(); return false;">Login</a>
+                        <a class="nav-link" onclick="openSignupModal(); return false;">Sign Up</a>
                     {% endif %}
                 </div>
                 <div class="volume-control">

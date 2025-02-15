@@ -126,7 +126,7 @@ async def favorite_song(id):
     if 'token' not in session:
         return jsonify({
             "error": "You must be logged in to favorite a song",
-            "redirect": "/login"
+            "modal": true
         }), 401
     user_id = session['token']
     song = await Song.get(id)
@@ -146,7 +146,7 @@ async def unfavorite_song(id):
     if 'token' not in session:
         return jsonify({
             "error": "You must be logged in to unfavorite a song",
-            "redirect": "/login"
+            "modal": true
         }), 401
     user_id = session['token']
     song = await Song.get(id)

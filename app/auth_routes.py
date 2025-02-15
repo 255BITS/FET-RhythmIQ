@@ -16,7 +16,11 @@ async def login():
             return redirect(url_for('home'))
         else:
             error = result.get('error') if result else "Invalid credentials"
+            if request.headers.get("HX-Request"):
+                return await render_template('login.html', error=error, modal=True)
             return await render_template('login.html', error=error)
+    if request.headers.get("HX-Request"):
+        return await render_template('login.html', modal=True)
     return await render_template('login.html')
 
 @auth_bp.route('/signup', methods=['GET', 'POST'])
@@ -37,7 +41,11 @@ async def signup():
             return redirect(url_for('auth.login'))
         except auth_module.UserExistsError as e:
             error = str(e)
+            if request.headers.get("HX-Request"):
+                return await render_template('signup.html', error=error, modal=True)
             return await render_template('signup.html', error=error)
+    if request.headers.get("HX-Request"):
+        return await render_template('signup.html', modal=True)
     return await render_template('signup.html')
 
 @auth_bp.route('/verify/<token>')

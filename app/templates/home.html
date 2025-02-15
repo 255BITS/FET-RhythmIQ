@@ -86,7 +86,11 @@
         </div>
     </div>
     <div class="mt-4">
-      <a href="favorites" class="text-xs underline">View favorites</a>
+      {% if session.token %}
+        <a href="favorites" class="text-xs underline">View favorites</a>
+      {% else %}
+        <a href="#" class="text-xs underline" onclick="openLoginModal(); return false;">View favorites</a>
+      {% endif %}
     </div>
 </div>
 {% endblock %}
