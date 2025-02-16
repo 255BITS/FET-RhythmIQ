@@ -13,6 +13,9 @@ async def login():
         result = await auth_module.login(email, password)
         if result and 'token' in result:
             session['token'] = result['token']
+            if request.headers.get("HX-Request"):
+                # For HTMX requests, close the modal without a full page reload
+                return "<script>document.getElementById('loginModal').style.display='none';</script>"
             return redirect(url_for('home'))
         else:
             error = result.get('error') if result else "Invalid credentials"
@@ -38,6 +41,9 @@ async def signup():
             message = f"Click this link to verify your email: {verification_link}"
             await send_mail(email, subject, message)
             await flash("Signup successful! Please check your email to verify your account.")
+            if request.headers.get("HX-Request"):
+                # After successful signup via HTMX, load the login form in the modal
+                return await render_template('login.html', modal=True)
             return redirect(url_for('auth.login'))
         except auth_module.UserExistsError as e:
             error = str(e)
@@ -70,9 +76,14 @@ async def forgot_password():
             message = f"Click this link to reset your password: {reset_link}"
             await send_mail(email, subject, message)
             await flash("Password reset email sent. Please check your email.")
+            if request.headers.get("HX-Request"):
+                # Close the modal on successful password reset request
+                return "<script>document.getElementById('loginModal').style.display='none';</script>"
             return redirect(url_for('auth.login'))
         else:
             await flash("Email not found.")
+            if request.headers.get("HX-Request"):
+                return await render_template('forgot_password.html', modal=True)
             return await render_template('forgot_password.html')
     return await render_template('forgot_password.html')
 
