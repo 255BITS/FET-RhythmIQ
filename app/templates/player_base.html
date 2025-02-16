@@ -181,7 +181,7 @@
     loginModalOpen: false
 }">
   <!-- Login/Signup Modal Container -->
-  <div id="loginModal" x-ref="loginModal" x-show="loginModalOpen" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50" style="display: none;">
+  <div id="loginModal" x-ref="loginModal" x-show="loginModalOpen" class="z-50 fixed inset-0 flex items-center justify-center bg-black bg-opacity-50" style="display: none;">
     <div class="bg-gray-900 p-6 rounded-lg relative z-[10]">
       <button @click="loginModalOpen = false" class="absolute top-2 right-2 text-gray-400">&times;</button>
       <div id="loginModalContent"></div>
