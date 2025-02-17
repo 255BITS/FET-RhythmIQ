@@ -40,3 +40,4 @@ websockets==10.4
 wheel==0.44.0
 yarl==1.17.1
 ai_agent_toolbox>=0.1.16
+sentry-sdk==2.21.0
