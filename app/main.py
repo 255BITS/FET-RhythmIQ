@@ -9,6 +9,11 @@ import logging
 from datetime import timedelta
 import pg_simple_auth
 
+import sentry_sdk
+ENV = os.getenv("ENV", "dev")
+if ENV == "production":
+    sentry_sdk.init("https://756882d884764bf4b59139e5f29b1e94@errors.255labs.xyz/2")
+
 # Configure logging
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
