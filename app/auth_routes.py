@@ -14,13 +14,12 @@ async def login():
         if result and 'token' in result:
             session['token'] = result['token']
             if request.headers.get("HX-Request"):
-                # For HTMX requests, close the modal without a full page reload
-                return "<script>document.getElementById('loginModal').style.display='none';</script>"
+                return await render_template('_auth.html')
             return redirect(url_for('home'))
         else:
             error = result.get('error') if result else "Invalid credentials"
             if request.headers.get("HX-Request"):
-                return await render_template('login.html', error=error, modal=True)
+                return await render_template('_auth.html', error=error)
             return await render_template('login.html', error=error)
     if request.headers.get("HX-Request"):
         return await render_template('login.html', modal=True)

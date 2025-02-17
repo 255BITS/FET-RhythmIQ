@@ -1,0 +1,13 @@
+<div class="nav-links" id="auth" style="margin: 0 1rem;">
+    {% if session.token %}
+        <a href="{{ url_for('auth.logout') }}" class="nav-link">Logout</a>
+    {% else %}
+        <a class="nav-link cursor-pointer" @click="loginModalOpen = true" hx-get="{{ url_for('auth.login') }}" hx-target="#loginModalContent" hx-swap="innerHTML">Login</a>
+        <a class="nav-link cursor-pointer" @click="loginModalOpen = true" hx-get="{{ url_for('auth.signup') }}" hx-target="#loginModalContent" hx-swap="innerHTML">Sign Up</a>
+    {% endif %}
+</div>
+{% if error %}
+  <script>document.getElementById('loginError').style.display='block';</script>
+{% else %}
+  <script>document.getElementById('loginModal').style.display='none';</script>
+{% endif %}
