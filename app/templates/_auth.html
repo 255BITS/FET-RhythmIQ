@@ -7,7 +7,10 @@
     {% endif %}
 </div>
 {% if error %}
-  <script>document.getElementById('loginError').style.display='block';</script>
+  <script>
+    document.getElementById('loginError').innerText="{{error}}";
+    document.getElementById('loginError').classList.remove('hidden');
+  </script>
 {% else %}
   <script>document.getElementById('loginModal').style.display='none';</script>
 {% endif %}

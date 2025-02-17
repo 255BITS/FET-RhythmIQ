@@ -34,20 +34,22 @@ async def signup():
         try:
             result = await auth_module.signup(email, password)
             await auth_module.verify(result['verification_token'])
+
             # send verification email
             verification_link = url_for('auth.verify_email', token=result['verification_token'], _external=True)
+            result = await auth_module.login(email, password)
+            if result and 'token' in result:
+                session['token'] = result['token']
             subject = "Verify your email"
             message = f"Click this link to verify your email: {verification_link}"
             await send_mail(email, subject, message)
-            await flash("Signup successful! Please check your email to verify your account.")
             if request.headers.get("HX-Request"):
-                # After successful signup via HTMX, load the login form in the modal
-                return await render_template('login.html', modal=True)
+                return await render_template('_auth.html')
             return redirect(url_for('auth.login'))
         except auth_module.UserExistsError as e:
             error = str(e)
             if request.headers.get("HX-Request"):
-                return await render_template('signup.html', error=error, modal=True)
+                return await render_template('_auth.html', error=error)
             return await render_template('signup.html', error=error)
     if request.headers.get("HX-Request"):
         return await render_template('signup.html', modal=True)

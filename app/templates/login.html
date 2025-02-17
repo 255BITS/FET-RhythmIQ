@@ -4,9 +4,7 @@
 {% block content %}
 <div class="max-w-md mx-auto mt-10 bg-gray-900 p-6 rounded-lg shadow-lg">
   <h2 class="text-2xl font-bold mb-4">Login</h2>
-  {% if error %}
-  <div id='loginError' class="bg-red-800 text-red-200 p-2 mb-4 rounded">{{ error }}</div>
-  {% endif %}
+  <div id='loginError' class="bg-red-800 text-red-200 p-2 mb-4 rounded hidden">{{ error }}</div>
   <form hx-post="{{ url_for('auth.login') }}" hx-target="#auth" hx-swap="outerHTML" method="post">
     <div class="mb-4">
       <label class="block mb-2">Email</label>
