@@ -5,6 +5,11 @@ import os
 import json
 import time
 import requests
+import sentry_sdk
+ENV = os.getenv("ENV", "dev")
+
+if ENV == "production":
+    sentry_sdk.init("https://d65669d0e41742c1a5a1c2c026732860@errors.255labs.xyz/3")
 
 load_dotenv()
 
