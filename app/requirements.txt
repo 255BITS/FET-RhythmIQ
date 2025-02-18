@@ -25,3 +25,4 @@ wheel==0.44.0
 wsproto==1.2.0
 sentry-sdk==2.21.0
 pg_simple_auth>=0.1.2
+argon2_cffi==23.1.0

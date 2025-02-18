@@ -1,3 +1,4 @@
+
 import asyncpg
 from datetime import datetime
 import json
@@ -8,29 +9,63 @@ import uuid
 pool = None
 
 class Song:
-    def __init__(self, id, name, created_at, status, details, image_url: Optional[str] = None, image_large_url: Optional[str] = None, video_url: Optional[str] = None, audio_url: Optional[str] = None, generation_uuid = None, listens = None, favorite_count = 0):
+    def __init__(
+        self,
+        id: Optional[int] = None,
+        name: Optional[str] = None,
+        created_at: Optional[datetime] = None,
+        status: Optional[str] = None,
+        details: Optional[dict] = None,
+        image_url: Optional[str] = None,
+        image_large_url: Optional[str] = None,
+        video_url: Optional[str] = None,
+        audio_url: Optional[str] = None,
+        generation_uuid: Optional[str] = None,
+        listens: Optional[int] = 0,
+        favorite_count: Optional[int] = 0,
+        album_id: Optional[int] = None,
+        station_id: Optional[int] = None,
+        playlist_id: Optional[int] = None,
+
+        **kwargs  # Catch-all for any extra fields in the DB
+    ):
+        # Known fields
         self.id = id
         self.name = name
         self.created_at = created_at
         self.status = status
         self.listens = listens
-        try:
-            self.details = json.loads(details) if isinstance(details, str) else details
-        except json.JSONDecodeError:
-            self.details = {}
+        self.favorite_count = favorite_count
+
+        # Details can be JSON in the DB. Ensure it's a dict in Python.
+        if isinstance(details, str):
+            try:
+                self.details = json.loads(details)
+            except json.JSONDecodeError:
+                self.details = {}
+        else:
+            self.details = details or {}
 
         self.image_url = image_url
         self.image_large_url = image_large_url
         self.video_url = video_url
         self.audio_url = audio_url
         self.generation_uuid = generation_uuid
-        self.favorite_count = favorite_count
+
+        # If you want to keep track of extra fields not explicitly handled:
+        self._extra = kwargs  # Store them so they're not lost or cause an error
+
+    @classmethod
+    def from_db_record(cls, record):
+        """
+        Convert an asyncpg.Record into a dict and pass it to the constructor.
+        """
+        # Convert the record to a dict so ** unpacking works
+        record_dict = dict(record)
+        return cls(**record_dict)
 
     @classmethod
     async def get_all_favorites(cls):
-        """
-        Fetch all songs that have been marked as favorites by any user.
-        """
         async with pool.acquire() as conn:
             rows = await conn.fetch(
                 """
@@ -40,17 +75,12 @@ class Song:
                 ORDER BY favorite_count DESC, created_at DESC
                 """
             )
-        return [cls(*row) for row in rows]
+        # Use from_db_record for each row
+        return [cls.from_db_record(row) for row in rows]
 
     @classmethod
     async def get_all_favorites_filtered(cls, delta):
-        """
-        Fetch all songs that have been marked as favorites by any user within the given time interval.
-        `delta` should be a datetime.timedelta object.
-        """
-        # Compute the lower bound in Python.
         lower_bound = datetime.utcnow() - delta
-        
         async with pool.acquire() as conn:
             rows = await conn.fetch(
                 """
@@ -62,15 +92,14 @@ class Song:
                 """,
                 lower_bound
             )
-        return [cls(*row) for row in rows]
+        return [cls.from_db_record(row) for row in rows]
 
     @classmethod
     async def create(cls, **kwargs):
-        # Set default values for optional fields
+        # Provide default values for optional fields
         name = kwargs.get("name", "Unknown Title")
         status = kwargs.get("status", "new")
         details = kwargs.get("details", {})
-        tags = kwargs.get("tags", [])
 
         image_url = kwargs.get("image_url")
         image_large_url = kwargs.get("image_large_url")
@@ -81,13 +110,25 @@ class Song:
         async with pool.acquire() as conn:
             row = await conn.fetchrow(
                 """
-                INSERT INTO songs (name, created_at, status, details, image_url, image_large_url, video_url, audio_url, generation_uuid)
+                INSERT INTO songs (
+                    name, created_at, status, details, 
+                    image_url, image_large_url, 
+                    video_url, audio_url, generation_uuid
+                )
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-                RETURNING id, name, created_at, status, details, image_url, image_large_url, video_url, audio_url, generation_uuid
+                RETURNING *
                 """,
-                name, datetime.now(), status, json.dumps(details), image_url, image_large_url, video_url, audio_url, generation_uuid
+                name,
+                datetime.now(),
+                status,
+                json.dumps(details),
+                image_url,
+                image_large_url,
+                video_url,
+                audio_url,
+                generation_uuid
             )
-        return cls(*row)
+        return cls.from_db_record(row)
 
     @classmethod
     async def get(cls, song_id):
@@ -97,7 +138,7 @@ class Song:
                 int(song_id)
             )
         if row:
-            return cls(*row)
+            return cls.from_db_record(row)
         return None
 
     @classmethod
@@ -118,19 +159,18 @@ class Song:
                 ORDER BY created_at ASC
                 LIMIT $3
             """, song.created_at, song.generation_uuid, limit)
-        return [cls(*row) for row in rows]
+        return [cls.from_db_record(row) for row in rows]
 
     @classmethod
     async def get_all(cls):
         async with pool.acquire() as conn:
             rows = await conn.fetch("SELECT * FROM songs ORDER BY created_at DESC")
-        return [cls(*row) for row in rows]
+        return [cls.from_db_record(row) for row in rows]
 
     @classmethod
     async def last_complete(cls, offset):
-        offset *= 2 #hack
+        offset *= 2  # hack
         async with pool.acquire() as conn:
-            # Fetch the Nth last completed song
             rows = await conn.fetch(
                 """
                 SELECT * FROM songs
@@ -140,11 +180,11 @@ class Song:
                 """,
                 1, offset
             )
-            
+
             if rows:
                 # If we found a song at the offset, return it
-                return cls(*rows[0])
-            
+                return cls.from_db_record(rows[0])
+
             # If no completed songs are found at that offset, return the last one if any exist
             if offset > 0:
                 rows = await conn.fetch(
@@ -156,7 +196,7 @@ class Song:
                     """
                 )
                 if rows:
-                    return cls(*rows[0])
+                    return cls.from_db_record(rows[0])
 
         # No completed songs in the database; return a mock object
         return cls(
@@ -201,7 +241,9 @@ class Song:
                 "UPDATE songs SET image_url = $1, image_large_url = $2, video_url = $3, audio_url = $4 WHERE id = $5",
                 image_url, image_large_url, video_url, audio_url, self.id
             )
-        self.image_url, self.image_large_url, self.video_url, self.audio_url = image_url, image_large_url, video_url, audio_url
+        self.image_url, self.image_large_url, self.video_url, self.audio_url = (
+            image_url, image_large_url, video_url, audio_url
+        )
 
     async def increment_listen_count(self):
         async with pool.acquire() as conn:
@@ -308,6 +350,9 @@ async def init_db(pool_instance):
             ALTER TABLE songs ADD COLUMN IF NOT EXISTS image_large_url TEXT;
             ALTER TABLE songs ADD COLUMN IF NOT EXISTS video_url TEXT;
             ALTER TABLE songs ADD COLUMN IF NOT EXISTS audio_url TEXT;
+            ALTER TABLE songs ADD COLUMN IF NOT EXISTS album_id INTEGER DEFAULT NULL;
+            ALTER TABLE songs ADD COLUMN IF NOT EXISTS station_id INTEGER DEFAULT NULL;
+            ALTER TABLE songs ADD COLUMN IF NOT EXISTS playlist_id INTEGER DEFAULT NULL;
             ALTER TABLE songs ADD COLUMN IF NOT EXISTS generation_uuid UUID;
             ALTER TABLE songs ADD COLUMN IF NOT EXISTS listens INTEGER DEFAULT 0;
             ALTER TABLE songs DROP COLUMN IF EXISTS tags;
@@ -321,3 +366,4 @@ async def init_db(pool_instance):
                 UNIQUE(user_id, song_id)
             );
         """)
+
