@@ -253,9 +253,20 @@ def parse_song_response(response_text):
     for event in events:
         if event.is_tool_call:
             if event.tool.name == "song":
-                return toolbox.use(event).result
+                result = toolbox.use(event).result
+                return apply_length_constraints(result)
     print("No write_song event found in the response.")
     return {}
+
+def apply_length_constraints(song_data):
+    song_data['description'] = song_data.get('description', "No description found").strip()
+    song_data['title'] = song_data.get('title', "No title found").strip()[:80]
+    if not song_data.get('lyrics'):
+        assert False, "No lyrics found"
+    song_data['lyrics'] = song_data['lyrics'].strip()[:3000]
+    song_data['style'] = song_data.get('style', "No style found").strip()[:120]
+    song_data['negative_style'] = song_data.get('negative_style', "").strip()[:120]
+    return song_data
 
 def main():
     """
