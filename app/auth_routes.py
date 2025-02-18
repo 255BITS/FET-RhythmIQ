@@ -36,13 +36,9 @@ async def signup():
             await auth_module.verify(result['verification_token'])
 
             # send verification email
-            verification_link = url_for('auth.verify_email', token=result['verification_token'], _external=True)
             result = await auth_module.login(email, password)
             if result and 'token' in result:
                 session['token'] = result['token']
-            subject = "Verify your email"
-            message = f"Click this link to verify your email: {verification_link}"
-            await send_mail(email, subject, message)
             if request.headers.get("HX-Request"):
                 return await render_template('_auth.html')
             return redirect(url_for('auth.login'))

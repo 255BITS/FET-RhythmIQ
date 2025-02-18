@@ -55,7 +55,7 @@ async def home():
     current_song = await Song.last_complete(5)
     user_id = None
     if 'token' in session:
-        user_id = pg_simple_auth.decode_token(session['token'])["user_id"]
+        user_id = str(pg_simple_auth.decode_token(session['token'])["user_id"])
     is_favorite = False
     if user_id:
         is_favorite = await UserFavorite.exists(user_id=user_id, song_id=current_song.id)
@@ -132,7 +132,7 @@ async def favorite_song(id):
             "error": "You must be logged in to favorite a song",
             "modal": True
         }), 401
-    user_id = pg_simple_auth.decode_token(session['token'])["user_id"]
+    user_id = str(pg_simple_auth.decode_token(session['token'])["user_id"])
     song = await Song.get(id)
     if not song:
         return jsonify({"error": "Song not found"}), 404
@@ -152,7 +152,7 @@ async def unfavorite_song(id):
             "error": "You must be logged in to unfavorite a song",
             "modal": True
         }), 401
-    user_id = pg_simple_auth.decode_token(session['token'])["user_id"]
+    user_id = str(pg_simple_auth.decode_token(session['token'])["user_id"])
     song = await Song.get(id)
     if not song:
         return jsonify({"error": "Song not found"}), 404
@@ -169,7 +169,7 @@ async def unfavorite_song(id):
 async def get_favorite_count(id):
     user_id = None
     if 'token' in session:
-        user_id = pg_simple_auth.decode_token(session['token'])["user_id"]
+        user_id = str(pg_simple_auth.decode_token(session['token'])["user_id"])
     song = await Song.get(id)
     if not song:
         return jsonify({"error": "Song not found"}), 404
