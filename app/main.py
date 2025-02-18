@@ -50,16 +50,15 @@ async def setup():
         auth_config=auth_config
     )
 
-@app.before_request
-async def before_request():
-    if 'temp_user_id' not in session:
-        session['temp_user_id'] = str(uuid.uuid4())
-
 @app.route('/')
 async def home():
-    user_id = session['temp_user_id']
     current_song = await Song.last_complete(5)
-    is_favorite = await UserFavorite.exists(user_id=user_id, song_id=current_song.id)
+    user_id = None
+    if 'token' in session:
+        user_id = pg_simple_auth.decode_token(session['token'])["user_id"]
+    is_favorite = False
+    if user_id:
+        is_favorite = await UserFavorite.exists(user_id=user_id, song_id=current_song.id)
     return await render_template('home.html', current_song=current_song, is_favorite=is_favorite)
 
 @app.route('/favorites')
@@ -131,9 +130,9 @@ async def favorite_song(id):
     if 'token' not in session:
         return jsonify({
             "error": "You must be logged in to favorite a song",
-            "modal": true
+            "modal": True
         }), 401
-    user_id = session['token']
+    user_id = pg_simple_auth.decode_token(session['token'])["user_id"]
     song = await Song.get(id)
     if not song:
         return jsonify({"error": "Song not found"}), 404
@@ -151,9 +150,9 @@ async def unfavorite_song(id):
     if 'token' not in session:
         return jsonify({
             "error": "You must be logged in to unfavorite a song",
-            "modal": true
+            "modal": True
         }), 401
-    user_id = session['token']
+    user_id = pg_simple_auth.decode_token(session['token'])["user_id"]
     song = await Song.get(id)
     if not song:
         return jsonify({"error": "Song not found"}), 404
@@ -168,12 +167,16 @@ async def unfavorite_song(id):
 
 @app.route('/song/<int:id>/favorite_count', methods=['GET'])
 async def get_favorite_count(id):
-    user_id = session['temp_user_id']
+    user_id = None
+    if 'token' in session:
+        user_id = pg_simple_auth.decode_token(session['token'])["user_id"]
     song = await Song.get(id)
     if not song:
         return jsonify({"error": "Song not found"}), 404
 
-    is_favorite = await UserFavorite.exists(user_id=user_id, song_id=id)
+    is_favorite = False
+    if user_id:
+        is_favorite = await UserFavorite.exists(user_id=user_id, song_id=id)
     favorite_count = await song.get_favorite_count()
 
     return jsonify({
