@@ -105,20 +105,29 @@
     },
     toggleFavorite() {
         const endpoint = this.isFavorite ? `/song/${this.currentSongId}/unfavorite` : `/song/${this.currentSongId}/favorite`;
-        fetch(endpoint, { 
+        fetch(endpoint, {
             method: 'POST'
         })
         .then(response => response.json())
         .then(data => {
+            // If the response indicates the user isn't logged in, open the login modal and load the login form.
+            if (data.modal) {
+                this.loginModalOpen = true;
+                const loginContent = document.getElementById('loginModalContent');
+                if (!loginContent.innerHTML.trim()) {
+                    htmx.ajax('GET', '{{ url_for("auth.login") }}', {target: loginContent});
+                }
+                return;
+            }
+            
             this.isFavorite = data.is_favorite;
             this.favoriteCount = data.favorite_count;
             if (this.isFavorite) {
-              this.lastFavoriteCount += 1;
+                this.lastFavoriteCount += 1;
+                this.animateHeart();
             } else {
-              this.lastFavoriteCount -= 1;
+                this.lastFavoriteCount -= 1;
             }
-            if (!this.isFavorite) return;
-            this.animateHeart();
         });
     },
     checkAndAnimateHearts(data) {
