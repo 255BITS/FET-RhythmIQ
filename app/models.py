@@ -108,6 +108,7 @@ class Song:
         image_large_url = kwargs.get("image_large_url")
         video_url = kwargs.get("video_url")
         audio_url = kwargs.get("audio_url")
+        model_name = kwargs.get("model_name")
         generation_uuid = kwargs.get("generation_uuid", str(uuid.uuid4()))
 
         async with pool.acquire() as conn:
@@ -116,9 +117,9 @@ class Song:
                 INSERT INTO songs (
                     name, created_at, status, details, 
                     image_url, image_large_url, 
-                    video_url, audio_url, generation_uuid
+                    video_url, audio_url, generation_uuid, model_name
                 )
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
                 RETURNING *
                 """,
                 name,
@@ -129,7 +130,8 @@ class Song:
                 image_large_url,
                 video_url,
                 audio_url,
-                generation_uuid
+                generation_uuid,
+                model_name
             )
         return cls.from_db_record(row)
 
