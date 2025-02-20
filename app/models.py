@@ -23,9 +23,8 @@ class Song:
         generation_uuid: Optional[str] = None,
         listens: Optional[int] = 0,
         favorite_count: Optional[int] = 0,
-        album_id: Optional[int] = None,
-        station_id: Optional[int] = None,
-        playlist_id: Optional[int] = None,
+        model_name: Optional[str] = None,
+        station: Optional[str] = None,
 
         **kwargs  # Catch-all for any extra fields in the DB
     ):
@@ -51,6 +50,8 @@ class Song:
         self.video_url = video_url
         self.audio_url = audio_url
         self.generation_uuid = generation_uuid
+        self.model_name = model_name
+        self.station = station
 
         # If you want to keep track of extra fields not explicitly handled:
         self._extra = kwargs  # Store them so they're not lost or cause an error
@@ -351,11 +352,16 @@ async def init_db(pool_instance):
             ALTER TABLE songs ADD COLUMN IF NOT EXISTS video_url TEXT;
             ALTER TABLE songs ADD COLUMN IF NOT EXISTS audio_url TEXT;
             ALTER TABLE songs ADD COLUMN IF NOT EXISTS album_id INTEGER DEFAULT NULL;
+            ALTER TABLE songs ADD COLUMN IF NOT EXISTS model_name TEXT DEFAULT NULL;
+            ALTER TABLE songs ADD COLUMN IF NOT EXISTS station TEXT DEFAULT NULL;
             ALTER TABLE songs ADD COLUMN IF NOT EXISTS station_id INTEGER DEFAULT NULL;
             ALTER TABLE songs ADD COLUMN IF NOT EXISTS playlist_id INTEGER DEFAULT NULL;
             ALTER TABLE songs ADD COLUMN IF NOT EXISTS generation_uuid UUID;
             ALTER TABLE songs ADD COLUMN IF NOT EXISTS listens INTEGER DEFAULT 0;
             ALTER TABLE songs DROP COLUMN IF EXISTS tags;
+            ALTER TABLE songs DROP COLUMN IF EXISTS station_id;
+            ALTER TABLE songs DROP COLUMN IF EXISTS album_id;
+            ALTER TABLE songs DROP COLUMN IF EXISTS playlist_id;
             ALTER TABLE songs ADD COLUMN IF NOT EXISTS favorite_count INTEGER DEFAULT 0;
 
             CREATE TABLE IF NOT EXISTS user_favorites (
