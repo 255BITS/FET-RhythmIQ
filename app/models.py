@@ -4,6 +4,7 @@ from datetime import datetime
 import json
 from typing import Optional
 import uuid
+from model_selector import get_model_nickname
 
 # Define a global pool variable
 pool = None
@@ -51,7 +52,7 @@ class Song:
         self.audio_url = audio_url
         self.generation_uuid = generation_uuid
         self.model_name = model_name
-        self.model_nickname = model_name #TODO lookup from thte model_selector based on the model_name
+        self.model_nickname = get_model_nickname(model_name)[1]
         self.station = station
 
         # If you want to keep track of extra fields not explicitly handled:
