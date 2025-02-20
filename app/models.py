@@ -51,6 +51,7 @@ class Song:
         self.audio_url = audio_url
         self.generation_uuid = generation_uuid
         self.model_name = model_name
+        self.model_nickname = model_name #TODO lookup from thte model_selector based on the model_name
         self.station = station
 
         # If you want to keep track of extra fields not explicitly handled:

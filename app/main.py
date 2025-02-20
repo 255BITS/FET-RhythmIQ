@@ -101,8 +101,9 @@ async def update_queue():
     if len(songs) < 6 and len(generating_songs) == 0:
         # Prevent duplicate generation if already processing
         generation_uuid = str(uuid.uuid4())
-        song1 = await Song.create(name="New Song 1", status="generating", generation_uuid=generation_uuid)
-        song2 = await Song.create(name="New Song 2", status="generating", generation_uuid=generation_uuid)
+        model_name = "chatgpt-4o-latest"
+        song1 = await Song.create(name="New Song 1", status="generating", generation_uuid=generation_uuid, model_name=model_name)
+        song2 = await Song.create(name="New Song 2", status="generating", generation_uuid=generation_uuid, model_name=model_name)
         asyncio.create_task(generate_song_with_agent([song1, song2]))
     return await render_template('partials/queue.html', songs=songs, song=current_song, number_generating=len(generating_songs))
 
@@ -282,12 +283,15 @@ async def generate_song_with_agent(songs):
 
 def js_escape(value):
     """Escape characters that would interfere with JavaScript strings."""
-    return (
-        value.replace('\\', '\\\\')  # Escape backslashes
-             .replace("'", "\\'")     # Escape single quotes
-             .replace('"', '\\"')     # Escape double quotes
-             .replace("\n", ' ')     # Escape double quotes
-    )
+    if value:
+        return (
+            value.replace('\\', '\\\\')  # Escape backslashes
+                 .replace("'", "\\'")     # Escape single quotes
+                 .replace('"', '\\"')     # Escape double quotes
+                 .replace("\n", ' ')     # Escape double quotes
+        )
+    else:
+        return value
 
 app.jinja_env.filters['jsescape'] = js_escape
 app.secret_key = APP_SECRET

@@ -1,7 +1,14 @@
 {% extends "player_base.html" %}
 
 {% block content %}
-<div class="player-content">
+<div class="player-content" x-data="{
+    currentSongId: {{ current_song.id }},
+    currentSongName: '{{ current_song.name|default('No track playing')|jsescape }}',
+    currentSongStyle: '{{ current_song.details.style|default('')|jsescape }}',
+    currentSongImage: '{{ current_song.image_large_url|default('/static/images/placeholder.jpg', true)|jsescape }}',
+    currentSongModelName: '{{ current_song.model_name|jsescape }}',
+    currentSongModelNickname: '{{ current_song.model_nickname|jsescape }}'
+}">
     <div class="now-playing">
         <div class="current-track-container">
             <img :src="currentSongImage"
@@ -10,8 +17,11 @@
             <div class="track-info">
                 <span class="label">Now Playing:</span>
                 <span class="song-title" x-text="currentSongName"></span>
+                <span class="artist-tag cursor-default" 
+                      x-bind:title="currentSongModelName" 
+                      x-if="currentSongModelName"
+                      x-text="currentSongModelNickname"></span>
                 <span class="style-tag-full" x-text="currentSongStyle"></span>
-                <span class="artist-tag" title="GPT-4O Maestro">chatgpt-4o-latest</span>
             </div>
         </div>
         <div class="song-actions">
@@ -21,9 +31,8 @@
                 <span class="heart-icon" x-text="isFavorite ? '❤️' : '🤍'"></span>
             </button>
             <span class="favorite-count" 
-                  x-text="favoriteCount"
-                  ></span>
-              <span class='hidden'
+                  x-text="favoriteCount"></span>
+            <span class='hidden'
                   :hx-get="`/song/${currentSongId}/favorite_count`"
                   hx-trigger="every 5s"
                   hx-swap="innerHTML"
@@ -40,9 +49,8 @@
                           checkAndAnimateHearts(JSON.parse(event.detail.xhr.response));
                         }
                       });
-                      })">
+                    })">
             </span>
-
         </div>
     </div>
     
