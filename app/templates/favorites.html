@@ -108,7 +108,9 @@
               <span class="song-name">{{ song.name }} (+{{song.favorite_count}})</span>
               <div class="song-info">
                       <span class="style-tag">{{ song.details.style }}</span>
-                      <span class="artist-tag cursor-default" title="{{ song.model_name }}">{{ song.model_nickname }}</span>
+                      {% if song.model_nickname %}
+                        <span class="artist-tag cursor-default" title="{{ song.model_name }}">{{ song.model_nickname }}</span>
+                      {% endif %}
                       <span class="status-tag">{{ song.status }}</span>
               </div>
             </div>
