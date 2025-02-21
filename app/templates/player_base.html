@@ -73,7 +73,10 @@
                 id: nextSongElement.dataset.songId,
                 audio_url: nextSongElement.dataset.audioUrl,
                 name: nextSongElement.dataset.name,
+                artist: nextSongElement.dataset.artist,
                 style: nextSongElement.dataset.style,
+                model: nextSongElement.dataset.model,
+                artist: nextSongElement.dataset.artist,
                 image_large_url: nextSongElement.dataset.imageUrl
             };
         } else {
@@ -84,6 +87,8 @@
         this.currentSongName = data.name || 'No track playing';
         this.currentSongStyle = data.style || '';
         this.currentSongImage = data.image_large_url || '/static/images/placeholder.jpg';
+        this.currentSongModelName = data.model || 'None';
+        this.currentSongModelNickname = data.artist || 'None';
         this.updateFavoriteStatus();
     },
     updateSongId() {

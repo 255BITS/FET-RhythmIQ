@@ -5,6 +5,8 @@
       data-audio-url="{{ song.audio_url }}"
       data-name="{{ song.name }}"
       data-style="{{ song.details.style }}"
+      data-model="{{ song.model_name }}"
+      data-artist="{{ song.model_nickname }}"
       data-image-url="{{ song.image_large_url|default('/static/images/placeholder.jpg', true) }}">
         <img src="{{ song.image_url|default('/static/images/placeholder.jpg', true) }}" 
              alt="Album Cover" 
