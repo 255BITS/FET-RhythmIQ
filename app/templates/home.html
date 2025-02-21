@@ -17,10 +17,12 @@
             <div class="track-info">
                 <span class="label">Now Playing:</span>
                 <span class="song-title" x-text="currentSongName"></span>
-                <span class="artist-tag cursor-default" 
-                      x-bind:title="currentSongModelName" 
-                      x-if="currentSongModelName"
-                      x-text="currentSongModelNickname"></span>
+
+                <template x-if="currentSongModelNickname != 'None'">
+                    <span class="artist-tag cursor-default" 
+                          x-bind:title="currentSongModelName" 
+                          x-text="currentSongModelNickname"></span>
+                </template>
                 <span class="style-tag-full" x-text="currentSongStyle"></span>
             </div>
         </div>
