@@ -163,7 +163,7 @@ def send_payload(prompt, server=LOCAL_SERVER_ADDRESS, port=LOCAL_SERVER_PORT):
 
     return response.json()["choices"][0]["message"]["content"]
 
-def generate_song(instruction=None):
+def generate_song(instruction=None, model_name=None, artist=None):
     """
     Generates a song based on the provided instruction.
 
@@ -213,6 +213,9 @@ def generate_song(instruction=None):
 
         # Build the user prompt
         user_prompt = formatter.usage_prompt(toolbox)+"\n\n"+base_prompt+f"\n\nAdditional Instructions:\n{instruction}"#f"{base_prompt}\n{''.join(examples)}\n\nInstructions:\n{instruction}"
+        if artist:
+            user_prompt += f"\n\nYou are the artist: {artist}"
+
         print("SYSTEM", system_prompt, "USER", user_prompt)
 
     except FileNotFoundError as e:
@@ -225,7 +228,7 @@ def generate_song(instruction=None):
     # Call the appropriate GPT provider
     if GPT_PROVIDER == "nanogpt":
         print("\n--- Using NanoGPT API ---")
-        nano_response = talk_to_gpt(user_prompt, messages=messages)
+        nano_response = talk_to_gpt(user_prompt, messages=messages, model=model_name)
         if nano_response:
             print("NanoGPT Response:", nano_response['text_response'])
             song_data = parse_song_response(nano_response['text_response'])

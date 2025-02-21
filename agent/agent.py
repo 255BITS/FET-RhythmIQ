@@ -36,6 +36,8 @@ class Response(Model):
 # Define the models
 class WriteSongRequest(Model):
     instruction: str
+    artist_name: str
+    model_name: str
 
 class WriteSongResponse(Model):
     title: str
@@ -64,7 +66,9 @@ proto = Protocol(name="SongwriterProtocol", version="1.0")
 async def handle_song_request(ctx: Context, sender: str, msg: WriteSongRequest):
     # Use prompt.py's generate_song function
     instruction = msg.instruction
-    song_data = generate_song(instruction)
+    model_name = msg.model_name
+    artist = msg.artist_name
+    song_data = generate_song(instruction, model_name, artist)
 
     if song_data:
         response = WriteSongResponse(
@@ -86,7 +90,9 @@ lyricist.include(proto)
 async def handle_post(ctx: Context, req: WriteSongRequest) -> WriteSongResponse:
     ctx.logger.info("Writing song")
     instruction = req.instruction
-    song_data = generate_song(instruction)
+    model_name = req.model_name
+    artist = req.artist_name
+    song_data = generate_song(instruction, model_name, artist)
     return WriteSongResponse(
         title=song_data.get('title', ''),
         lyrics=song_data.get('lyrics', ''),
