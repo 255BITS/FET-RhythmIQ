@@ -59,7 +59,7 @@ def validate_environment():
     else:
         raise ValueError(f"Unsupported GPT_PROVIDER '{GPT_PROVIDER}'. Supported providers are 'nanogpt' and 'local'.")
 
-def talk_to_gpt(prompt, model=NANOGPT_DEFAULT_MODEL, messages=None):
+def talk_to_gpt(prompt, model=None, messages=None):
     """
     Sends a prompt to the NanoGPT API using the OpenAI-compatible chat completions endpoint
     and returns the response in the same format as before.
@@ -75,6 +75,8 @@ def talk_to_gpt(prompt, model=NANOGPT_DEFAULT_MODEL, messages=None):
               - "text_response": The generated text from the assistant.
               - "nano_info": Additional info (e.g. usage statistics) from the API.
     """
+    if model is None:
+        model = NANOGPT_DEFAULT_MODEL
     headers = {
         "Authorization": f"Bearer {NANOGPT_API_KEY}",
         "Content-Type": "application/json"
