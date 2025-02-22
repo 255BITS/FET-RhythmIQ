@@ -26,6 +26,9 @@
     currentSongName: '{{ current_song.name|default('No track playing')|jsescape }}',
     currentSongStyle: '{{ current_song.details.style|default('')|jsescape }}',
     currentSongImage: '{{ current_song.image_large_url|default('/static/images/placeholder.jpg', true)|jsescape }}',
+    currentSongModelName: '{{ current_song.model_name|jsescape }}',
+    currentSongModelNickname: '{{ current_song.model_nickname|jsescape }}',
+
     isFavorite: {{ 'true' if is_favorite else 'false' }},
     favoriteCount: {{ current_song.favorite_count }},
     lastFavoriteCount: {{ current_song.favorite_count }},

@@ -1,14 +1,7 @@
 {% extends "player_base.html" %}
 
 {% block content %}
-<div class="player-content" x-data="{
-    currentSongId: {{ current_song.id }},
-    currentSongName: '{{ current_song.name|default('No track playing')|jsescape }}',
-    currentSongStyle: '{{ current_song.details.style|default('')|jsescape }}',
-    currentSongImage: '{{ current_song.image_large_url|default('/static/images/placeholder.jpg', true)|jsescape }}',
-    currentSongModelName: '{{ current_song.model_name|jsescape }}',
-    currentSongModelNickname: '{{ current_song.model_nickname|jsescape }}'
-}">
+<div class="player-content">
     <div class="now-playing">
         <div class="current-track-container">
             <img :src="currentSongImage"
