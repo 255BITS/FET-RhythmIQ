@@ -86,7 +86,8 @@ async def favorites():
     print("favorites", favorites)
 
     current_song = favorites[0] if favorites else None
-    return await render_template('favorites.html', favorites=favorites, current_song=current_song, filter=filter_param)
+    remaining_favorites = favorites[1:] if favorites else []
+    return await render_template('favorites.html', favorites=remaining_favorites, current_song=current_song, filter=filter_param)
 
 @app.route('/create_song')
 async def create_song():
