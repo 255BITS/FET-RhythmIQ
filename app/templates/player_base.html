@@ -30,6 +30,17 @@
     currentSongModelNickname: '{{ current_song.model_nickname|jsescape }}',
 
     isFavorite: {{ 'true' if is_favorite else 'false' }},
+    // For sharing
+    shareMenuOpen: false,
+    copySongLink() {
+        // Build the shareable link
+        const link = `${window.location.origin}/song/${this.currentSongId}`;
+        navigator.clipboard.writeText(link).then(() => {
+            alert('Link copied to clipboard!');
+            this.shareMenuOpen = false;
+        });
+    },
+
     favoriteCount: {{ current_song.favorite_count }},
     lastFavoriteCount: {{ current_song.favorite_count }},
     userId: '{{ user_id }}',
