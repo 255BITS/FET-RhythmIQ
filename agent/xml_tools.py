@@ -23,7 +23,7 @@ toolbox.add_tool(
     args={
         "title": {"type": "string", "description": "The title of the song"},
         "lyrics": {"type": "string", "description": "The lyrics of the song"},
-        "style": {"type": "string", "description": "The style of the song. Greatly effects generation."},
+        "style": {"type": "string", "description": "The style of the song. Greatly effects generation. Should be a genre, new genre, or something explorative. It should be a comma seperated list of genres. Example 'motown, dream pop, upbeat', or 'male voice, dark rap, soulful'. Do not add notes about the song generation, just short genre tags like this."},
         "negative_style": {"type": "string", "description": "Any negative style elements of the song"}
     },
     description="Write a song."
