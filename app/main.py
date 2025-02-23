@@ -187,6 +187,24 @@ async def get_favorite_count(id):
         "favorite_count": (favorite_count or 0)
     })
 
+@app.route('/song/<int:id>')
+async def song(id):
+    """
+    Display the music player like the home page but with the specified song.
+    """
+    current_song = await Song.get(id)
+    if not current_song:
+        return jsonify({"error": "Song not found"}), 404
+
+    user_id = None
+    if 'token' in session:
+        user_id = str(pg_simple_auth.decode_token(session['token'])["user_id"])
+    is_favorite = False
+    if user_id:
+        is_favorite = await UserFavorite.exists(user_id=user_id, song_id=current_song.id)
+
+    return await render_template('home.html', current_song=current_song, is_favorite=is_favorite)
+
 # New route to generate song using the agent
 async def generate_song_with_agent(songs):
     """
