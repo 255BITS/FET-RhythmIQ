@@ -28,31 +28,7 @@
             <span class="favorite-count" 
                   x-text="favoriteCount"></span>
             
-            <!-- Share Button -->
-            <button class="share-btn ml-2 px-2 py-1 border border-gray-500 rounded"
-                    @click="shareMenuOpen = !shareMenuOpen">
-              Share
-            </button>
-
-            <!-- Share Menu -->
-            <div x-show="shareMenuOpen" class="absolute mt-2 bg-gray-800 p-2 rounded shadow text-sm"
-                 style="display: none;">
-              <ul class="space-y-1">
-                <li>
-                  <a :href="`https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.origin + '/song/' + currentSongId)}&text=${encodeURIComponent(currentSongName)}`" target="_blank">
-                    Share on X (Twitter)
-                  </a>
-                </li>
-                <li>
-                  <a :href="`https://www.instagram.com/?url=${encodeURIComponent(window.location.origin + '/song/' + currentSongId)}`" target="_blank">
-                    Share on Instagram
-                  </a>
-                </li>
-                <li>
-                  <button @click="copySongLink()">Copy link</button>
-                </li>
-              </ul>
-            </div>
+            {% include 'partials/social.html' %}
             <span class='hidden'
                   :hx-get="`/song/${currentSongId}/favorite_count`"
                   hx-trigger="every 5s"
