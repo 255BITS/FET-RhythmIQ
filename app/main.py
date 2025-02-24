@@ -203,7 +203,7 @@ async def song(id):
     if user_id:
         is_favorite = await UserFavorite.exists(user_id=user_id, song_id=current_song.id)
 
-    return await render_template('home.html', current_song=current_song, is_favorite=is_favorite)
+    return await render_template('home.html', current_song=current_song, is_favorite=is_favorite, seo=True)
 
 # New route to generate song using the agent
 async def generate_song_with_agent(songs):

@@ -1,0 +1,17 @@
+{% if current_song %}
+  <meta name="description" content="{{ current_song.details.description or 'Listen to this amazing track on RhythmIQ.' }}">
+  <meta name="robots" content="index, follow">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="music.song">
+  <meta property="og:title" content="{{ current_song.name }}">
+  <meta property="og:description" content="{{ current_song.details.description or 'Listen to this amazing track on RhythmIQ.' }}">
+  <meta property="og:image" content="{{ current_song.image_large_url }}">
+  <meta property="og:url" content="{{ url_for('song', id=current_song.id, _external=True) }}">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ current_song.name }}">
+  <meta name="twitter:description" content="{{ current_song.details.description or 'Listen to this amazing track on RhythmIQ.' }}">
+  <meta name="twitter:image" content="{{ current_song.image_large_url }}">
+{% endif %}
