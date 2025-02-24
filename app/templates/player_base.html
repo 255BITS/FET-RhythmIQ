@@ -36,8 +36,10 @@
         // Build the shareable link
         const link = `${window.location.origin}/song/${this.currentSongId}`;
         navigator.clipboard.writeText(link).then(() => {
-            alert('Link copied to clipboard!');
+            // Show a temporary message instead of an alert
+            this.showCopiedMessage = true;
             this.shareMenuOpen = false;
+            setTimeout(() => { this.showCopiedMessage = false; }, 2000);
         });
     },
 
@@ -205,6 +207,7 @@
                 this.favoriteCount = data.favorite_count;
             });
     },
+    showCopiedMessage: false,
     // Add loginModalOpen flag to control the modal
     loginModalOpen: false
 }">
@@ -251,6 +254,9 @@
         </div>
     </div>
 
+    <div x-show="showCopiedMessage" x-transition class="fixed bottom-4 right-4 bg-gray-800 text-white p-2 rounded shadow">
+        Song link copied to clipboard
+    </div>
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
 </html>
