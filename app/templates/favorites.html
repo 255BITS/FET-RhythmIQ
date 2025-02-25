@@ -2,6 +2,11 @@
 
 {% block content %}
 <div class="player-content">
+    {% if fallback_message %}
+      <div class="fallback-message" style="text-align: center; margin-bottom: 1rem;">
+        {{ fallback_message }}
+      </div>
+    {% endif %}
     <!-- Now Playing section -->
     <div class="now-playing">
         <div class="current-track-container">

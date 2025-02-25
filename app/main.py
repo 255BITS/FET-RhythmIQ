@@ -68,21 +68,22 @@ async def favorites():
     List all songs favorited by users.
     """
     filter_param = request.args.get("filter", "all_time")
-    if filter_param == "yesterday":
-        delta = timedelta(days=1)
+    fallback_message = ""
+    if filter_param != "all_time":
+        if filter_param == "yesterday":
+            delta = timedelta(days=1)
+        elif filter_param == "last_week":
+            delta = timedelta(days=7)
+        elif filter_param == "last_month":
+            delta = timedelta(days=30)
+        elif filter_param == "last_3_months":
+            delta = timedelta(days=90)
+        elif filter_param == "last_year":
+            delta = timedelta(days=365)
         favorites = await Song.get_all_favorites_filtered(delta)
-    elif filter_param == "last_week":
-        delta = timedelta(days=7)
-        favorites = await Song.get_all_favorites_filtered(delta)
-    elif filter_param == "last_month":
-        delta = timedelta(days=30)
-        favorites = await Song.get_all_favorites_filtered(delta)
-    elif filter_param == "last_3_months":
-        delta = timedelta(days=90)
-        favorites = await Song.get_all_favorites_filtered(delta)
-    elif filter_param == "last_year":
-        delta = timedelta(days=365)
-        favorites = await Song.get_all_favorites_filtered(delta)
+        if not favorites:
+            fallback_message = f"No new favorites({filter_param.replace('_', ' ')}). Showing all time favorites."
+            favorites = await Song.get_all_favorites()
     else:
         favorites = await Song.get_all_favorites()
 
@@ -90,7 +91,7 @@ async def favorites():
 
     current_song = favorites[0] if favorites else None
     remaining_favorites = favorites[1:] if favorites else []
-    return await render_template('favorites.html', favorites=remaining_favorites, current_song=current_song, filter=filter_param)
+    return await render_template('favorites.html', favorites=remaining_favorites, current_song=current_song, filter=filter_param, fallback_message=fallback_message)
 
 @app.route('/create_song')
 async def create_song():
