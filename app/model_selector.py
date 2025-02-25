@@ -6,7 +6,8 @@ MODEL_NICKNAMES = {
     "deepseek-reasoner": "Deep Seeker",
     "grok-3": "Grok Rhymes",
     "r1-1776": "Perplexity Renegade",
-    "claude-3-5-sonnet-20241022": "Sonnet 3.5",
+    #"claude-3-5-sonnet-20241022": "Sonnet 3.5",
+    'claude-3-7-sonnet-20250219': "Sonnet 3.7",
     "gemini-2.0-pro-exp-02-05": "G-Mini Pro",
     "gemini-2.0-flash-thinking-exp-01-21": "G-Mini Flash"
 }
