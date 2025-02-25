@@ -68,7 +68,10 @@ async def favorites():
     List all songs favorited by users.
     """
     filter_param = request.args.get("filter", "all_time")
-    if filter_param == "last_week":
+    if filter_param == "yesterday":
+        delta = timedelta(days=1)
+        favorites = await Song.get_all_favorites_filtered(delta)
+    elif filter_param == "last_week":
         delta = timedelta(days=7)
         favorites = await Song.get_all_favorites_filtered(delta)
     elif filter_param == "last_month":
