@@ -227,9 +227,19 @@
     <div class="max-w-4xl mx-auto p-6">
         <div class="retro-player-container">
             <div class="player-header">
-                <div class="logo-container cursor-default select-none">
-                    <span class="wave-icon">(((•)))</span>
-                    <h1 class="retro-title">RhythmIQ</h1>
+                <div class="logo-container cursor-default select-none inline-flex items-center">
+                    {% if request.path != '/' %}
+                      <a href="{{ url_for('home') }}" class="no-underline text-inherit inline-flex items-center">
+                    {% else %}
+                      <span class="no-underline text-inherit inline-flex items-center">
+                    {% endif %}
+                        <span class="wave-icon inline-block">(((•)))</span>
+                        <h1 class="retro-title inline-block m-0 ml-2">RhythmIQ</h1>
+                    {% if request.path != '/' %}
+                      </a>
+                    {% else %}
+                      </span>
+                    {% endif %}
                 </div>
                 <div class="volume-control">
                     <button x-on:click="$refs.audioPlayer.muted = !$refs.audioPlayer.muted" x-text="$refs.audioPlayer.muted ? '🔇' : '🔊'" class="volume-icon"></button>
