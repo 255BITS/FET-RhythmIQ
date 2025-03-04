@@ -32,9 +32,9 @@ STATIONS = [
 ]
 
 
-def random_station():
+def get_random_station():
     """Select and return a random station dictionary."""
-    return random.choice(STATIONS)
+    return random.choice(STATIONS)["id"]
 
 
 def get_station_by_id(station_id):
