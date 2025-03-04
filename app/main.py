@@ -7,6 +7,7 @@ import json
 import uuid
 import logging
 from datetime import timedelta
+from stations import get_random_station
 import pg_simple_auth
 from model_selector import get_random_model_name
 
@@ -108,8 +109,8 @@ async def update_queue():
         # Prevent duplicate generation if already processing
         generation_uuid = str(uuid.uuid4())
         model_name = get_random_model_name()
-        song1 = await Song.create(name="New Song 1", status="generating", generation_uuid=generation_uuid, model_name=model_name)
-        song2 = await Song.create(name="New Song 2", status="generating", generation_uuid=generation_uuid, model_name=model_name)
+        song1 = await Song.create(name="New Song 1", station=get_random_station(), status="generating", generation_uuid=generation_uuid, model_name=model_name)
+        song2 = await Song.create(name="New Song 2", station=get_random_station(), status="generating", generation_uuid=generation_uuid, model_name=model_name)
         asyncio.create_task(generate_song_with_agent([song1, song2]))
     return await render_template('partials/queue.html', songs=songs, song=current_song, number_generating=len(generating_songs))
 

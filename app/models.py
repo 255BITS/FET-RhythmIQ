@@ -1,4 +1,3 @@
-
 import asyncpg
 from datetime import datetime
 import json
@@ -52,7 +51,7 @@ class Song:
         self.audio_url = audio_url
         self.generation_uuid = generation_uuid
         self.model_name = model_name
-        self.model_nickname = get_model_nickname(model_name)[1]
+        self.model_nickname = get_model_nickname(model_name)[1] if model_name else None
         self.station = station
 
         # If you want to keep track of extra fields not explicitly handled:
@@ -123,7 +122,7 @@ class Song:
                 RETURNING *
                 """,
                 name,
-                datetime.now(),
+                datetime.utcnow(),
                 status,
                 json.dumps(details),
                 image_url,
@@ -174,7 +173,7 @@ class Song:
 
     @classmethod
     async def last_complete(cls, offset):
-        offset *= 2  # hack
+        offset *= 2  # FIXME: Double offset for compatibility with pagination
         async with pool.acquire() as conn:
             rows = await conn.fetch(
                 """
@@ -222,7 +221,7 @@ class Song:
                 "UPDATE songs SET name = $1 WHERE id = $2",
                 name, self.id
             )
-        self.status = name
+        self.name = name
 
     async def update_status(self, new_status):
         async with pool.acquire() as conn:
@@ -286,7 +285,7 @@ class UserFavorite:
                 VALUES ($1, $2, $3)
                 RETURNING id, user_id, song_id, created_at
                 """,
-                user_id, song_id, datetime.now()
+                user_id, song_id, datetime.utcnow()
             )
         return cls(*row)
 
@@ -355,11 +354,13 @@ async def init_db(pool_instance):
             ALTER TABLE songs ADD COLUMN IF NOT EXISTS image_large_url TEXT;
             ALTER TABLE songs ADD COLUMN IF NOT EXISTS video_url TEXT;
             ALTER TABLE songs ADD COLUMN IF NOT EXISTS audio_url TEXT;
+            /* Removed redundant column additions:
             ALTER TABLE songs ADD COLUMN IF NOT EXISTS album_id INTEGER DEFAULT NULL;
-            ALTER TABLE songs ADD COLUMN IF NOT EXISTS model_name TEXT DEFAULT NULL;
-            ALTER TABLE songs ADD COLUMN IF NOT EXISTS station TEXT DEFAULT NULL;
             ALTER TABLE songs ADD COLUMN IF NOT EXISTS station_id INTEGER DEFAULT NULL;
             ALTER TABLE songs ADD COLUMN IF NOT EXISTS playlist_id INTEGER DEFAULT NULL;
+            */
+            ALTER TABLE songs ADD COLUMN IF NOT EXISTS model_name TEXT DEFAULT NULL;
+            ALTER TABLE songs ADD COLUMN IF NOT EXISTS station TEXT DEFAULT NULL;
             ALTER TABLE songs ADD COLUMN IF NOT EXISTS generation_uuid UUID;
             ALTER TABLE songs ADD COLUMN IF NOT EXISTS listens INTEGER DEFAULT 0;
             ALTER TABLE songs DROP COLUMN IF EXISTS tags;
@@ -376,4 +377,3 @@ async def init_db(pool_instance):
                 UNIQUE(user_id, song_id)
             );
         """)
-
