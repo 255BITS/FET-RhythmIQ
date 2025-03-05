@@ -165,7 +165,7 @@ def send_payload(prompt, server=LOCAL_SERVER_ADDRESS, port=LOCAL_SERVER_PORT):
 
     return response.json()["choices"][0]["message"]["content"]
 
-def generate_song(instruction=None, model_name=None, artist=None):
+def generate_song(instruction=None, model_name=None, artist=None, station=None):
     """
     Generates a song based on the provided instruction.
 

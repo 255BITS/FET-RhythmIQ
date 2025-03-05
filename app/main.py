@@ -227,7 +227,7 @@ async def generate_song_with_agent(songs):
             for song in songs:
                 await song.update_status("writing lyrics")
 
-            response_write_song = await client.post(f"{AGENT_HOST}/write_song", json={"instruction":"", "model_name": song.model_name, "artist_name": song.model_nickname}, timeout=1000)
+            response_write_song = await client.post(f"{AGENT_HOST}/write_song", json={"instruction":"", "station": song.station, "model_name": song.model_name, "artist_name": song.model_nickname}, timeout=1000)
 
             if response_write_song.status_code == 200:
                 lyrics_result = response_write_song.json()

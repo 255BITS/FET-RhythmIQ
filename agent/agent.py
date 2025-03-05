@@ -38,6 +38,7 @@ class WriteSongRequest(Model):
     instruction: str
     artist_name: str
     model_name: str
+    station: str
 
 class WriteSongResponse(Model):
     title: str
@@ -68,7 +69,8 @@ async def handle_song_request(ctx: Context, sender: str, msg: WriteSongRequest):
     instruction = msg.instruction
     model_name = msg.model_name
     artist = msg.artist_name
-    song_data = generate_song(instruction, model_name, artist)
+    station = msg.station
+    song_data = generate_song(instruction, model_name, artist, station)
 
     if song_data:
         response = WriteSongResponse(
@@ -92,7 +94,8 @@ async def handle_post(ctx: Context, req: WriteSongRequest) -> WriteSongResponse:
     instruction = req.instruction
     model_name = req.model_name
     artist = req.artist_name
-    song_data = generate_song(instruction, model_name, artist)
+    station = msg.station
+    song_data = generate_song(instruction, model_name, artist, station)
     return WriteSongResponse(
         title=song_data.get('title', ''),
         lyrics=song_data.get('lyrics', ''),
