@@ -6,6 +6,7 @@ import os
 import json
 import uuid
 import logging
+import sys
 from datetime import timedelta
 import pg_simple_auth
 from model_selector import get_random_model_name
