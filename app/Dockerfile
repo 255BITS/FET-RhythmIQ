@@ -17,6 +17,7 @@ RUN pip install uvicorn
 
 # Copy the rest of the application code
 COPY . .
+COPY ../common /common
 
 # Expose the port your Quart app will run on
 EXPOSE 8257

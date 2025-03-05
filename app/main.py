@@ -7,11 +7,13 @@ import json
 import uuid
 import logging
 from datetime import timedelta
-from stations import get_random_station
 import pg_simple_auth
 from model_selector import get_random_model_name
-
 import sentry_sdk
+
+sys.path.insert(0, os.path.abspath("../common"))
+from stations import get_random_station
+
 ENV = os.getenv("ENV", "dev")
 if ENV == "production":
     sentry_sdk.init("https://756882d884764bf4b59139e5f29b1e94@errors.255labs.xyz/2")

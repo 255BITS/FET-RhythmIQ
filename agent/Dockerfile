@@ -15,6 +15,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application code
 COPY . .
+COPY ../common /common
 
 # Expose the port your Quart app will run on
 EXPOSE 8258
