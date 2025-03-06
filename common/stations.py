@@ -50,3 +50,16 @@ def get_station_announcement(station):
     """Format the station announcement in a radio announcer style."""
     tagline = station.get("tagline", "")
     return f"{station['frequency']} {station['name']} - {tagline}"
+
+
+def get_station_instructions(station_id):
+    """Return formatted station instructions for the given station ID."""
+    station = get_station_by_id(station_id)
+    if station:
+        return (
+            f"Station:\n"
+            f"frequency: {station.get('frequency', 'N/A')}\n"
+            f"description: {station.get('description', 'No description available')}\n"
+            f"instruction: {station.get('instruction', 'No instruction available')}"
+        )
+    return ""

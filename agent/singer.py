@@ -187,13 +187,13 @@ def generate_song(instruction=None, model_name=None, artist=None, station=None):
             print("Failed to load a random instruction.")
             return None
 
-    # If a station is provided, lookup the station by id and append its instruction to the prompt.
+    # If a station is provided, lookup the station instructions and append to the prompt.
     if station:
         try:
-            from common.stations import get_station_by_id
-            station_obj = get_station_by_id(station)
-            if station_obj and station_obj.get("instruction"):
-                instruction += "\n\n" + station_obj["instruction"]
+            from common.stations import get_station_instructions
+            station_instructions = get_station_instructions(station)
+            if station_instructions:
+                instruction += "\n\n" + station_instructions
         except Exception as e:
             print(f"Error loading station instruction: {e}")
 
