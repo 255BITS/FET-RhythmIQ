@@ -3,8 +3,11 @@ import requests
 import json
 from dotenv import load_dotenv
 import random
+import sys
 import re  # Added for regex parsing
 from xml_tools import toolbox, parser, formatter
+sys.path.insert(0, os.path.abspath("../common"))
+from stations import get_station_instructions, get_station_by_id
 
 # Load environment variables from a .env file if present
 load_dotenv()
@@ -190,7 +193,6 @@ def generate_song(instruction=None, model_name=None, artist=None, station=None):
     # If a station is provided, lookup the station instructions and append to the prompt.
     if station:
         try:
-            from common.stations import get_station_instructions
             station_instructions = get_station_instructions(station)
             if station_instructions:
                 instruction += "\n\n" + station_instructions
