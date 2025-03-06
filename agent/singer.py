@@ -187,6 +187,16 @@ def generate_song(instruction=None, model_name=None, artist=None, station=None):
             print("Failed to load a random instruction.")
             return None
 
+    # If a station is provided, lookup the station by id and append its instruction to the prompt.
+    if station:
+        try:
+            from common.stations import get_station_by_id
+            station_obj = get_station_by_id(station)
+            if station_obj and station_obj.get("instruction"):
+                instruction += "\n\n" + station_obj["instruction"]
+        except Exception as e:
+            print(f"Error loading station instruction: {e}")
+
     # Get random song files for examples
     try:
         song_files = [f for f in os.listdir("songs") if f.endswith('.xml')]
