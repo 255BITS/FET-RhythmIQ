@@ -94,7 +94,7 @@ async def handle_post(ctx: Context, req: WriteSongRequest) -> WriteSongResponse:
     instruction = req.instruction
     model_name = req.model_name
     artist = req.artist_name
-    station = msg.station
+    station = req.station
     song_data = generate_song(instruction, model_name, artist, station)
     return WriteSongResponse(
         title=song_data.get('title', ''),

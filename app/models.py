@@ -108,6 +108,7 @@ class Song:
         video_url = kwargs.get("video_url")
         audio_url = kwargs.get("audio_url")
         model_name = kwargs.get("model_name")
+        station = kwargs.get("station")
         generation_uuid = kwargs.get("generation_uuid", str(uuid.uuid4()))
 
         async with pool.acquire() as conn:
@@ -116,9 +117,9 @@ class Song:
                 INSERT INTO songs (
                     name, created_at, status, details, 
                     image_url, image_large_url, 
-                    video_url, audio_url, generation_uuid, model_name
+                    video_url, audio_url, generation_uuid, model_name, station
                 )
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
                 RETURNING *
                 """,
                 name,
@@ -130,7 +131,8 @@ class Song:
                 video_url,
                 audio_url,
                 generation_uuid,
-                model_name
+                model_name,
+                station
             )
         return cls.from_db_record(row)
 
@@ -158,7 +160,7 @@ class Song:
                         OR (created_at >= NOW() - INTERVAL '10 minutes' AND status != 'complete')
                     )
                     AND generation_uuid != $2
-                    ORDER BY generation_uuid, created_at DESC
+                ORDER BY generation_uuid, created_at DESC
                 ) AS subquery
                 ORDER BY created_at ASC
                 LIMIT $3

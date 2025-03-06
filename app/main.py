@@ -226,11 +226,13 @@ async def generate_song_with_agent(songs):
     try:
         async with httpx.AsyncClient() as client:
             # Step 1: Call /write_song to generate lyrics
-            logging.debug("Calling /write_song endpoint to generate lyrics.")
             for song in songs:
                 await song.update_status("writing lyrics")
 
-            response_write_song = await client.post(f"{AGENT_HOST}/write_song", json={"instruction":"", "station": song.station, "model_name": song.model_name, "artist_name": song.model_nickname}, timeout=1000)
+            args = {"instruction":"", "station": song.station, "model_name": song.model_name, "artist_name": song.model_nickname}
+            logging.debug("Calling /write_song endpoint to generate lyrics.")
+            logging.debug(args)
+            response_write_song = await client.post(f"{AGENT_HOST}/write_song", json=args, timeout=1000)
 
             if response_write_song.status_code == 200:
                 lyrics_result = response_write_song.json()
