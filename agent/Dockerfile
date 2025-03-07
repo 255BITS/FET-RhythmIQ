@@ -9,16 +9,16 @@ ENV PYTHONUNBUFFERED 1
 WORKDIR /app
 
 # Copy the requirements file and install dependencies
-COPY requirements.txt .
+COPY agent/requirements.txt .
 RUN apt update && apt install -y git
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the application code
-COPY . .
-COPY ../common /common
+# Copy the rest of the agent application code
+COPY agent/ .
+COPY common /common
 
 # Expose the port your Quart app will run on
 EXPOSE 8258
 
-# Set the command to run the Quart app with Uvicorn
+# Set the command to run the agent
 CMD ["python", "agent.py", "--host", "0.0.0.0"]

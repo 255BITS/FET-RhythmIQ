@@ -9,15 +9,15 @@ ENV PYTHONUNBUFFERED 1
 WORKDIR /app
 
 # Copy the requirements file and install dependencies
-COPY requirements.txt .
+COPY app/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Install Uvicorn (if it's not already in your requirements.txt)
 RUN pip install uvicorn
 
 # Copy the rest of the application code
-COPY . .
-COPY ../common /common
+COPY app/ . 
+COPY common /common
 
 # Expose the port your Quart app will run on
 EXPOSE 8257
