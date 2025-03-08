@@ -23,25 +23,30 @@ def get_ecr_uri(service):
     return f"{ecr_uri}/{service}"
 
 def docker_build_push(service_path, service, ecr, version):
+    # original_dir is the current directory (project-root/app/deploy)
     original_dir = os.getcwd()
-    basepath = os.path.dirname(service_path)
-    os.chdir(f"..")
+    # Determine the project root (two levels up from app/deploy)
+    project_root = os.path.abspath(os.path.join(original_dir, "..", ".."))
+    
+    # Compute full path to the Dockerfile
+    dockerfile_path = os.path.join(project_root, service_path)
+    
+    # Build context is the project root
     cmd = [
-        'docker', 
-        'buildx', 
-        'build', 
-        '--platform', 
-        'linux/arm64', 
-        '-t', 
-        f'{ecr}:{version}', 
+        'docker',
+        'buildx',
+        'build',
+        '--platform',
+        'linux/arm64',
+        '-t',
+        f'{ecr}:{version}',
         '-f',
-        f'{service_path}',
-        '--push', 
-        basepath
+        dockerfile_path,
+        '--push',
+        project_root
     ]
     print("-- Running Docker Build and Push for Service:", service)
-    subprocess.check_call(cmd)
-    os.chdir(original_dir)
+    subprocess.check_call(cmd, cwd=project_root)
 
 def main():
     parser = argparse.ArgumentParser()
@@ -52,9 +57,10 @@ def main():
     aws_password = subprocess.check_output(['aws', 'ecr', 'get-login-password']).decode().strip()
 
     version = os.getenv('VERSION', '1.0')
+    # Use paths relative to the project root
     service_paths = {
-        'rhythmiq': './Dockerfile',
-        'rhythmiqagent': '../agent/Dockerfile'
+        'rhythmiq': 'app/Dockerfile',
+        'rhythmiqagent': 'agent/Dockerfile'
     }
     services = service_paths.keys()
 
@@ -68,7 +74,7 @@ def main():
             )
             docker_build_push(service_path, service, ecr, version)
         else:
-            print("Skipping ", service)
+            print("Skipping", service)
 
     print("Project has been built but not redeployed.  To redeploy run:")
     print("   python deploy.py")
