@@ -229,6 +229,7 @@
         x-on:timeupdate="updateProgress()" x-on:loadstart="updateSongId()"
         x-on:ended="handleSongEnd()"></audio>
     <div class="max-w-4xl mx-auto p-6">
+      {% include 'partials/stations.html' %}
         <div class="retro-player-container">
             <div class="player-header">
                 <div class="logo-container cursor-default select-none inline-flex items-center">
