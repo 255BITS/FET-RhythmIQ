@@ -63,3 +63,8 @@ def get_station_instructions(station_id):
             f"instruction: {station.get('instruction', 'No instruction available')}"
         )
     return ""
+
+
+def frequency_to_slug(frequency):
+    """Convert a station frequency (e.g. '99.1 FM') to a URL-friendly slug."""
+    return frequency.replace(" ", "")

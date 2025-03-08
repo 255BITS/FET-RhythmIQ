@@ -13,7 +13,7 @@ from model_selector import get_random_model_name
 import sentry_sdk
 
 sys.path.insert(0, os.path.abspath("../common"))
-from stations import get_random_station
+from stations import get_random_station, STATIONS
 
 ENV = os.getenv("ENV", "dev")
 if ENV == "production":
@@ -325,6 +325,27 @@ def js_escape(value):
 
 app.jinja_env.filters['jsescape'] = js_escape
 app.secret_key = APP_SECRET
+
+@app.context_processor
+def inject_stations():
+    """
+    Middleware that injects the list of stations into every template.
+    """
+    return {'stations': STATIONS}
+
+@app.route('/stations/<station_frequency>')
+async def station_page(station_frequency):
+    """
+    Route to display a station's page.
+    It matches the station by slugifying the station's frequency.
+    """
+    def slugify(freq):
+        return freq.replace(" ", "")
+
+    station = next((s for s in STATIONS if slugify(s["frequency"]) == station_frequency), None)
+    if not station:
+        return jsonify({"error": "Station not found"}), 404
+    return await render_template('station.html', station=station)
 
 from auth_routes import auth_bp
 app.register_blueprint(auth_bp)
