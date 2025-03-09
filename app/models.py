@@ -174,37 +174,38 @@ class Song:
         return [cls.from_db_record(row) for row in rows]
 
     @classmethod
-    async def last_complete(cls, offset):
+    async def last_complete(cls, offset, station=None):
         offset *= 2  # FIXME: Double offset for compatibility with pagination
         async with pool.acquire() as conn:
-            rows = await conn.fetch(
-                """
+            # Build main query dynamically based on station parameter
+            station_clause = "AND station = $3" if station else ""
+            params = [1, offset]
+            if station:
+                params.append(station)
+            query = f"""
                 SELECT * FROM songs
-                WHERE status = 'complete'
+                WHERE status = 'complete' {station_clause}
                 ORDER BY created_at DESC
                 LIMIT $1 OFFSET $2
-                """,
-                1, offset
-            )
-
+            """
+            rows = await conn.fetch(query, *params)
             if rows:
-                # If we found a song at the offset, return it
                 return cls.from_db_record(rows[0])
 
-            # If no completed songs are found at that offset, return the last one if any exist
             if offset > 0:
-                rows = await conn.fetch(
-                    """
+                # Fallback query: get the last complete song
+                station_clause = "AND station = $1" if station else ""
+                params = [station] if station else []
+                fallback_query = f"""
                     SELECT * FROM songs
-                    WHERE status = 'complete'
+                    WHERE status = 'complete' {station_clause}
                     ORDER BY created_at DESC
                     LIMIT 1
-                    """
-                )
+                """
+                rows = await conn.fetch(fallback_query, *params)
                 if rows:
                     return cls.from_db_record(rows[0])
 
-        # No completed songs in the database; return a mock object
         return cls(
             id=None,
             name="No Completed Song",
