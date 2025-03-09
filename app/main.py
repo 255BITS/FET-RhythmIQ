@@ -1,5 +1,6 @@
 from quart import Quart, render_template, jsonify, request, session
 from models import Song, UserFavorite, init_db, get_db_pool
+from auth_routes import auth_bp
 import asyncio
 import httpx
 import os
@@ -343,11 +344,15 @@ async def station_page(station_frequency):
         return freq.replace(" ", "")
 
     station = next((s for s in STATIONS if slugify(s["frequency"]) == station_frequency), None)
-    if not station:
-        return jsonify({"error": "Station not found"}), 404
-    return await render_template('station.html', station=station)
+    current_song = await Song.last_complete(5, station=station["id"])
+    user_id = None
+    if 'token' in session:
+        user_id = str(pg_simple_auth.decode_token(session['token'])["user_id"])
+    is_favorite = False
+    if user_id:
+        is_favorite = await UserFavorite.exists(user_id=user_id, song_id=current_song.id)
+    return await render_template('home.html', current_song=current_song, is_favorite=is_favorite)
 
-from auth_routes import auth_bp
 app.register_blueprint(auth_bp)
 
 if __name__ == '__main__':
