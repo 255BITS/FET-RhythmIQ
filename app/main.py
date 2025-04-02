@@ -1,4 +1,4 @@
-from quart import Quart, render_template, jsonify, request, session
+from quart import Quart, render_template, jsonify, request, session, jsonify
 from models import Song, UserFavorite, init_db, get_db_pool
 from auth_routes import auth_bp
 import asyncio
@@ -7,7 +7,7 @@ import os
 import json
 import uuid
 import logging
-import sys
+import sys # noqa
 from datetime import timedelta
 import pg_simple_auth
 from model_selector import get_random_model_name
@@ -97,6 +97,48 @@ async def favorites():
     current_song = favorites[0] if favorites else None
     remaining_favorites = favorites[1:] if favorites else []
     return await render_template('favorites.html', favorites=remaining_favorites, current_song=current_song, filter=filter_param, fallback_message=fallback_message)
+
+@app.route('/favorites.json')
+async def favorites_json():
+    """
+    Return a JSON list of favorite songs, optionally filtered by time.
+    Includes essential details like mp3 and thumbnail URLs.
+    """
+    filter_param = request.args.get("filter", "all_time")
+    favorites = []
+
+    if filter_param != "all_time":
+        delta = None
+        if filter_param == "yesterday":      delta = timedelta(days=1)
+        elif filter_param == "last_week":    delta = timedelta(days=7)
+        elif filter_param == "last_month":   delta = timedelta(days=30)
+        elif filter_param == "last_3_months": delta = timedelta(days=90)
+        elif filter_param == "last_year":    delta = timedelta(days=365)
+
+        if delta:
+            favorites = await Song.get_all_favorites_filtered(delta)
+        # If filter is invalid or yields no results, default to all time for JSON?
+        # Let's return what the filter found, even if empty, for API clarity.
+        # If no valid delta, fall through to all_time.
+
+    if not favorites and filter_param != "all_time": # Only fetch all_time if filter yielded nothing or filter was invalid
+        favorites = await Song.get_all_favorites()
+    elif filter_param == "all_time":
+        favorites = await Song.get_all_favorites()
+
+    # Prepare the data structure for JSON response
+    favorites_data = [{
+        "id": song.id,
+        "name": song.name,
+        "audio_url": song.audio_url,        # MP3 URL
+        "image_url": song.image_url,        # Thumbnail URL
+        "image_large_url": song.image_large_url, # Larger image if needed
+        "style": song.details.get("style", ""),
+        "model_nickname": song.model_nickname,
+        "favorite_count": song.favorite_count
+    } for song in favorites]
+
+    return jsonify(favorites_data)
 
 @app.route('/create_song')
 async def create_song():
