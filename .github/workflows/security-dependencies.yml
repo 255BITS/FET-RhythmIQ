@@ -1,0 +1,22 @@
+name: Security dependency compatibility
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  service:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      matrix:
+        component: [app, agent]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12.15"
+      - run: python -m pip install -r ${{ matrix.component }}/requirements.txt
+      - run: python -m pip check
+      - run: python tests/test_${{ matrix.component }}_dependencies.py
