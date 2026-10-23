@@ -33,7 +33,7 @@ rpds-py==0.21.0
 setuptools==84.2.1
 six==1.16.0
 typing_extensions==4.12.2
-uagents @ git+https://github.com/255BITS/uAgents.git@c42ad601f14cef1d5f9728d72a504f0c06df7e56#subdirectory=python
+uagents @ git+https://github.com/255BITS/uAgents.git@9be83064ac87aee9f54c8ffc2c4985b0852ba08f#subdirectory=python
 urllib3==2.8.0
 uvicorn==0.30.6
 websockets==10.4
