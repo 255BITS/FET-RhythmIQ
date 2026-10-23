@@ -1,5 +1,5 @@
 # Use an official Python runtime as a parent image
-FROM python:3.12-slim
+FROM python:3.12.15-slim
 
 # Patch trust before pip, Git, or SDK downloads (eMudhra incident, 2026-10-20).
 RUN apt-get update \
